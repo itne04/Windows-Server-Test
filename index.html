@@ -1,0 +1,1777 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ຄູ່ມືການບໍລິຫານຈັດການລະບົບໄອທີ (IT Admin Interactive Guide)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Phetsarath font for Lao */
+        @import url('https://cdn.jsdelivr.net/npm/@fontsource/phetsarath@5.0.8/index.css');
+
+        :root {
+            --font-scale: 1;
+        }
+        html {
+            font-size: calc(16px * var(--font-scale));
+            transition: font-size 0.25s ease-out;
+        }
+
+        body {
+            font-family: 'Times New Roman', 'Phetsarath', 'Saysettha OT', sans-serif;
+            background-color: #05070c;
+            color: #f1f5f9;
+        }
+
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0b0f19; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #334155; }
+
+        /* Highlight classes */
+        .highlight-keyword {
+            color: #fbbf24;
+            font-weight: 700;
+        }
+
+        /* Sidebar transitions */
+        #sidebar-nav {
+            width: 19rem;
+            min-width: 19rem;
+            transition: width .3s cubic-bezier(0.4, 0, 0.2, 1), min-width .3s cubic-bezier(0.4, 0, 0.2, 1), opacity .3s ease;
+        }
+        #sidebar-nav.sidebar-collapsed {
+            width: 0;
+            min-width: 0;
+            opacity: 0;
+        }
+
+        .section-hidden { display: none !important; }
+        .content-section { transition: opacity 0.2s ease-in-out; }
+
+        /* 3D Gate styling */
+        .door-perspective { perspective: 800px; }
+        .gate-door {
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: left center;
+            transform-style: preserve-3d;
+        }
+        .gate-open {
+            transform: rotateY(-80deg);
+        }
+
+        /* Virtual Windows Desktop styles */
+        .win-desktop {
+            background-size: cover;
+            background-position: center;
+            transition: background-image 0.5s ease-in-out;
+        }
+
+        /* Custom glow effect */
+        .glow-active {
+            box-shadow: 0 0 15px 2px rgba(99, 102, 241, 0.35);
+        }
+
+        /* Packet Ping Animation Path */
+        @keyframes ping-packet {
+            0% { stroke-dashoffset: 24; }
+            100% { stroke-dashoffset: 0; }
+        }
+        .ping-line-active {
+            stroke-dasharray: 6;
+            animation: ping-packet 1s linear infinite;
+        }
+
+        /* AD Tree active styles */
+        .tree-node-selected {
+            background-color: rgba(99, 102, 241, 0.15);
+            border-color: #6366f1;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body class="flex h-screen w-screen overflow-hidden">
+
+    <!-- ======================= SIDEBAR ======================= -->
+    <aside id="sidebar-nav" class="bg-slate-950 border-r border-slate-900 flex flex-col shadow-2xl z-30 flex-shrink-0">
+        <!-- Logo Header -->
+        <div class="p-5 border-b border-slate-900">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/10 flex-shrink-0">
+                    <span class="text-xl">🛠️</span>
+                </div>
+                <div class="min-w-0">
+                    <h1 class="text-sm font-black text-white tracking-wide truncate">IT Admin Slide-Guide</h1>
+                    <p class="text-[9px] text-slate-500 font-extrabold tracking-widest uppercase">Interactive Classroom Edition</p>
+                </div>
+            </div>
+            <div class="mt-3 px-3 py-1.5 bg-slate-900/60 rounded-lg border border-slate-800 flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="text-[11px] text-indigo-300 font-semibold truncate">ສຳລັບປະກອບການສອນ System Admin</span>
+            </div>
+        </div>
+
+        <!-- Navigation items -->
+        <nav class="flex-1 overflow-y-auto px-2.5 py-4 space-y-1">
+            <p class="px-3 mb-2 text-[9px] font-black text-slate-600 uppercase tracking-wider">ບົດຮຽນ & ຫົວຂໍ້</p>
+
+            <button onclick="showSection('section-network')" data-target="section-network"
+                class="nav-btn active-nav w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-left font-semibold text-xs transition-all whitespace-nowrap overflow-hidden">
+                <span class="text-base flex-shrink-0">🌐</span>
+                <span class="truncate">0. ຕັ້ງຄ່າ Network (Static IP)</span>
+            </button>
+
+            <button onclick="showSection('section-ad')" data-target="section-ad"
+                class="nav-btn w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-left font-semibold text-xs transition-all whitespace-nowrap overflow-hidden">
+                <span class="text-base flex-shrink-0">🏢</span>
+                <span class="truncate">1. ໂຄງສ້າງ AD (OU Hierarchy)</span>
+            </button>
+
+            <button onclick="showSection('section-gpo')" data-target="section-gpo"
+                class="nav-btn w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-left font-semibold text-xs transition-all whitespace-nowrap overflow-hidden">
+                <span class="text-base flex-shrink-0">📜</span>
+                <span class="truncate">2. ກົດລະບຽບອົງກອນ (GPO)</span>
+            </button>
+
+            <button onclick="showSection('section-permissions')" data-target="section-permissions"
+                class="nav-btn w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-left font-semibold text-xs transition-all whitespace-nowrap overflow-hidden">
+                <span class="text-base flex-shrink-0">🔐</span>
+                <span class="truncate">3. ສິດການເຂົ້າເຖິງ (Permissions)</span>
+            </button>
+
+            <button onclick="showSection('section-fsrm')" data-target="section-fsrm"
+                class="nav-btn w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-left font-semibold text-xs transition-all whitespace-nowrap overflow-hidden">
+                <span class="text-base flex-shrink-0">🚀</span>
+                <span class="truncate">4. ຈັດການ File Server (FSRM)</span>
+            </button>
+        </nav>
+
+        <!-- Sidebar footer -->
+        <div class="p-3 border-t border-slate-900 text-center">
+            <span class="text-[9px] text-slate-600 font-bold tracking-widest uppercase">ChaleunIT Admin Training</span>
+        </div>
+    </aside>
+
+    <!-- ======================= MAIN CONTENT AREA ======================= -->
+    <div class="flex-1 flex flex-col overflow-hidden min-w-0">
+
+        <!-- Sticky Header Bar -->
+        <header class="sticky top-0 bg-slate-950/80 backdrop-blur-md border-b border-slate-900 px-6 py-3 flex items-center justify-between z-20 flex-shrink-0">
+            <div class="flex items-center gap-2.5 min-w-0">
+                <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse flex-shrink-0"></span>
+                <h2 id="current-header-title" class="text-xs font-bold text-slate-300 truncate">
+                    ບົດນຳ: ການກຽມຄວາມພ້ອມ (Static IP)
+                </h2>
+            </div>
+            
+            <div class="flex items-center gap-4 flex-shrink-0">
+                <span class="text-[10px] text-slate-500 font-semibold hidden md:block">Font: Phetsarath / Times New Roman</span>
+                <div class="w-7 h-7 rounded-full bg-indigo-950 border border-indigo-900 flex items-center justify-center text-[10px] font-black text-indigo-400">IT</div>
+            </div>
+        </header>
+
+        <!-- Main content frame -->
+        <main class="flex-1 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 overflow-y-auto relative pb-24">
+
+            <!-- ======================= SECTION 0 — Static IP Setup ======================= -->
+            <section id="section-network" class="content-section p-6 md:p-8 max-w-7xl mx-auto">
+                <div class="mb-6 border-b border-slate-800 pb-4">
+                    <span class="bg-indigo-950 text-indigo-400 border border-indigo-800/40 px-2.5 py-0.5 rounded text-[10px] font-bold uppercase">ບົດນຳ</span>
+                    <h2 class="text-2xl md:text-3xl font-black text-white mt-2">ການຕັ້ງຄ່າ Network & Static IP</h2>
+                    <p class="text-slate-400 text-xs mt-1">ສິ່ງທຳອິດທີ່ຕ້ອງເຮັດກ່ອນ Config ລະບົບ Windows Server ໃນ VMware Workstation.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                    <!-- Column 1: Talking Points (Reduced Text) -->
+                    <div class="lg:col-span-5 bg-slate-950/70 p-5 rounded-xl border border-slate-900 flex flex-col gap-4">
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                            <span>🗣️</span><span>ປະເດັນສຳຄັນໃນການອະທິບາຍ</span>
+                        </h3>
+                        
+                        <div class="space-y-3.5 text-xs text-slate-300">
+                            <div class="p-3 bg-slate-900/40 border-l-4 border-indigo-500 rounded-r-lg">
+                                <h4 class="font-bold text-white mb-0.5">1. ເປັນຫຍັງຕ້ອງໃຊ້ Static IP?</h4>
+                                <p class="leading-relaxed">ເພາະເຊີເວີນີ້ຈະເປັນ <span class="highlight-keyword">Domain Controller</span> ແລະ <span class="highlight-keyword">DNS Server</span>. ຖ້າໃຊ້ IP ແບບ DHCP (ປ່ຽນແປງພາຍຫຼັງ), client ຈະຊອກຫາ AD ບໍ່ເຫັນ ແລະ ລະບົບຈະລົ້ມທັນທີ.</p>
+                            </div>
+                            <div class="p-3 bg-slate-900/40 border-l-4 border-violet-500 rounded-r-lg">
+                                <h4 class="font-bold text-white mb-0.5">2. ຕັ້ງຄ່າ VMware NAT Mode</h4>
+                                <p class="leading-relaxed">ໃນ VMware, Network Adapter ຕ້ອງເປັນ <span class="highlight-keyword">NAT Mode</span> ເພື່ອໃຫ້ Virtual Machine ແບ່ງປັນ Internet ກັບ Host ໄດ້ສະດວກ.</p>
+                            </div>
+                            <div class="p-3 bg-slate-900/40 border-l-4 border-emerald-500 rounded-r-lg">
+                                <h4 class="font-bold text-white mb-0.5">3. Preferred DNS Server</h4>
+                                <p class="leading-relaxed">ຕ້ອງກຳນົດເປັນ <span class="highlight-keyword">127.0.0.1</span> (Loopback address) ເພາະເຊີເວີນີ້ເປັນຕົວບໍລິການ DNS ໃຫ້ກັບ Active Directory ໃນຕົວເອງ.</p>
+                            </div>
+                        </div>
+
+                        <!-- Question Prompt -->
+                        <div class="mt-auto p-3.5 bg-indigo-950/30 border border-indigo-900/50 rounded-lg text-xs leading-relaxed">
+                            <span class="text-indigo-400 font-bold block mb-1">❓ ຄຳຖາມຖາມນັກຮຽນ:</span>
+                            "ຖ້າເຮົາບໍ່ຕັ້ງ DNS ໄປຫາຕົວເອງ (127.0.0.1) ແຕ່ໃສ່ 8.8.8.8 ແທນ, client ຈະ join domain ໄດ້ບໍ່?"
+                            <span class="text-slate-400 block mt-1 text-[10px] italic">(ຄຳຕອບ: ບໍ່ໄດ້, ເພາະ DNS 8.8.8.8 ຂອງ Google ບໍ່ຮູ້ຈັກຊື່ Domain local ຂອງເຮົາ)</span>
+                        </div>
+                    </div>
+
+                    <!-- Column 2: Interactive graphic -->
+                    <div class="lg:col-span-7 flex flex-col gap-5 justify-between">
+                        <!-- Windows TCP/IP Properties dialog simulator -->
+                        <div class="bg-slate-950/70 p-5 rounded-xl border border-slate-900">
+                            <div class="flex justify-between items-center pb-2.5 border-b border-slate-800 mb-4">
+                                <h4 class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                                    <span>⚙️</span><span>ຈຳລອງ Internet Protocol Version 4 (TCP/IPv4) Properties</span>
+                                </h4>
+                                <span class="text-[9px] bg-indigo-950 text-indigo-400 border border-indigo-900 px-1.5 py-0.5 rounded font-bold uppercase">Windows Dialog</span>
+                            </div>
+
+                            <div class="bg-slate-900/80 p-4 rounded-lg border border-slate-800/80 text-xs">
+                                <!-- Mode radio selector -->
+                                <div class="space-y-2 mb-4 bg-slate-950/50 p-2.5 rounded border border-slate-800">
+                                    <label class="flex items-center gap-2 cursor-pointer text-slate-400 select-none">
+                                        <input type="radio" name="ip-type" value="dhcp" onchange="switchIpSimMode('dhcp')" class="accent-indigo-500">
+                                        <span>Obtain an IP address automatically (DHCP - ⚠️ ຫ້າມໃຊ້)</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer text-white font-bold select-none">
+                                        <input type="radio" name="ip-type" value="static" onchange="switchIpSimMode('static')" checked class="accent-indigo-500">
+                                        <span>Use the following IP address (Static IP - ✅ ຖືກຕ້ອງ)</span>
+                                    </label>
+                                </div>
+
+                                <!-- Fields with interactive tooltips -->
+                                <div id="ip-fields-container" class="grid grid-cols-2 gap-3 mb-4">
+                                    <div onclick="showIpTooltip('ip')" class="bg-slate-950 p-2.5 rounded border border-slate-800 cursor-pointer hover:border-indigo-500/50 transition-all select-none">
+                                        <label class="text-slate-500 text-[10px] block font-bold">IP Address</label>
+                                        <span class="text-indigo-400 font-mono font-bold">192.168.100.10</span>
+                                        <span class="text-[9px] text-slate-500 block mt-0.5 hover:underline">ຄລິກເພື່ອອ່ານລາຍລະອຽດ</span>
+                                    </div>
+                                    <div onclick="showIpTooltip('subnet')" class="bg-slate-950 p-2.5 rounded border border-slate-800 cursor-pointer hover:border-indigo-500/50 transition-all select-none">
+                                        <label class="text-slate-500 text-[10px] block font-bold">Subnet Mask</label>
+                                        <span class="text-slate-300 font-mono font-semibold">255.255.255.0</span>
+                                        <span class="text-[9px] text-slate-500 block mt-0.5 hover:underline">ຄລິກເພື່ອອ່ານລາຍລະອຽດ</span>
+                                    </div>
+                                    <div onclick="showIpTooltip('gateway')" class="bg-slate-950 p-2.5 rounded border border-slate-800 cursor-pointer hover:border-indigo-500/50 transition-all select-none">
+                                        <label class="text-slate-500 text-[10px] block font-bold">Default Gateway (VMware NAT IP)</label>
+                                        <span class="text-slate-300 font-mono font-semibold">192.168.100.2</span>
+                                        <span class="text-[9px] text-slate-500 block mt-0.5 hover:underline">ຄລິກເພື່ອອ່ານລາຍລະອຽດ</span>
+                                    </div>
+                                    <div onclick="showIpTooltip('dns')" class="bg-slate-950 p-2.5 rounded border border-slate-800 cursor-pointer hover:border-indigo-500/50 transition-all select-none">
+                                        <label class="text-slate-500 text-[10px] block font-bold">Preferred DNS (Loopback)</label>
+                                        <span class="text-indigo-400 font-mono font-bold">127.0.0.1</span>
+                                        <span class="text-[9px] text-slate-500 block mt-0.5 hover:underline">ຄລິກເພື່ອອ່ານລາຍລະອຽດ</span>
+                                    </div>
+                                </div>
+
+                                <!-- Dynamic Explain Alert -->
+                                <div id="ip-sim-alert" class="p-3 bg-emerald-950/20 border border-emerald-900/50 text-emerald-400 rounded-lg">
+                                    <strong class="font-bold flex items-center gap-1.5"><span class="text-emerald-500">✅</span> <span>ພ້ອມຕິດຕັ້ງ:</span></strong>
+                                    <p class="mt-0.5 text-slate-300 text-[11px]">IP ຄົງທີ່ (Static IP) ຖືກຕ້ອງຕາມມາດຕະຖານ, ພ້ອມສຳລັບຕິດຕັ້ງ Active Directory Domain Services.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Graphical Network Map & Ping Simulator -->
+                        <div class="bg-slate-950/70 p-5 rounded-xl border border-slate-900">
+                            <div class="flex justify-between items-center pb-2.5 border-b border-slate-800 mb-3">
+                                <h4 class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                                    <span>💻</span><span>ແຜນວາດເຄືອຂ່າຍ & ການທົດສອບ Ping (NAT Mode)</span>
+                                </h4>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                                <!-- Network SVG Visualizer -->
+                                <div class="md:col-span-6 bg-slate-900/40 border border-slate-800/80 p-3 rounded-lg flex flex-col items-center justify-center min-h-[120px]">
+                                    <svg viewBox="0 0 200 80" class="w-full h-auto max-w-[220px]">
+                                        <!-- Nodes -->
+                                        <rect x="10" y="25" width="35" height="24" rx="3" fill="#1e1b4b" stroke="#4f46e5" stroke-width="1"/>
+                                        <text x="27.5" y="38" font-size="6" fill="#fff" font-weight="bold" text-anchor="middle">Server VM</text>
+                                        <text x="27.5" y="44" font-size="5" fill="#a5b4fc" text-anchor="middle">.100.10</text>
+
+                                        <rect x="85" y="25" width="30" height="24" rx="3" fill="#0f172a" stroke="#475569" stroke-width="1"/>
+                                        <text x="100" y="38" font-size="6" fill="#e2e8f0" font-weight="bold" text-anchor="middle">VM NAT</text>
+                                        <text x="100" y="44" font-size="5" fill="#94a3b8" text-anchor="middle">192.168.100.2</text>
+
+                                        <circle cx="170" cy="37" r="14" fill="#022c22" stroke="#10b981" stroke-width="1"/>
+                                        <text x="170" y="39" font-size="7" fill="#34d399" font-weight="bold" text-anchor="middle">Internet</text>
+
+                                        <!-- Paths -->
+                                        <path id="ping-path-1" d="M 45 37 L 85 37" fill="none" stroke="#334155" stroke-width="1.5"/>
+                                        <path id="ping-path-2" d="M 115 37 L 156 37" fill="none" stroke="#334155" stroke-width="1.5"/>
+                                    </svg>
+                                    <span id="ping-status-label" class="text-[10px] text-slate-500 mt-2 font-bold uppercase tracking-wider">ລໍຖ້າການທົດສອບ Ping</span>
+                                </div>
+
+                                <!-- Terminal output -->
+                                <div class="md:col-span-6 flex flex-col gap-2">
+                                    <div class="bg-black p-3 rounded-lg border border-slate-800 font-mono text-[10px] min-h-[90px] text-slate-300">
+                                        <div id="ping-terminal-text" class="space-y-0.5">
+                                            <span class="text-slate-500">C:\Users\Administrator&gt;_</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button onclick="triggerPingSim()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs py-1.5 rounded transition-all">
+                                            ▶ Run Ping Test
+                                        </button>
+                                        <button onclick="resetPingSim()" class="bg-slate-800 hover:bg-slate-700 text-slate-400 text-xs px-2.5 py-1.5 rounded transition-all">
+                                            Reset
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ======================= SECTION 1 — AD Hierarchy ======================= -->
+            <section id="section-ad" class="content-section section-hidden p-6 md:p-8 max-w-7xl mx-auto">
+                <div class="mb-6 border-b border-slate-800 pb-4">
+                    <span class="bg-indigo-950 text-indigo-400 border border-indigo-800/40 px-2.5 py-0.5 rounded text-[10px] font-bold uppercase">ບົດທີ 1</span>
+                    <h2 class="text-2xl md:text-3xl font-black text-white mt-2">ການອອກແບບໂຄງສ້າງອົງກອນ (Active Directory Hierarchy)</h2>
+                    <p class="text-slate-400 text-xs mt-1">ອອກແບບໂຄງສ້າງ OU ເພື່ອຮອງຮັບພະນັກງານ ແລະ ຄຸ້ມຄອງລະບົບຢ່າງເປັນລະບຽບ.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                    <!-- Column 1: Talking points -->
+                    <div class="lg:col-span-4 bg-slate-950/70 p-5 rounded-xl border border-slate-900 flex flex-col gap-4">
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                            <span>🗣️</span><span>ປະເດັນສຳຄັນໃນການອະທິບາຍ</span>
+                        </h3>
+                        
+                        <div class="space-y-3.5 text-xs text-slate-300">
+                            <div class="p-3 bg-slate-900/40 border-l-4 border-indigo-500 rounded-r-lg">
+                                <h4 class="font-bold text-white mb-0.5">1. Domain: Root ສູງສຸດ</h4>
+                                <p class="leading-relaxed">ເປັນຈຸດເລີ່ມຕົ້ນຂອງທຸກຢ່າງ ປຽບເໝືອນຊື່ຂອງບໍລິສັດ ເຊັ່ນ <span class="highlight-keyword">ChaleunIT.local</span>.</p>
+                            </div>
+                            <div class="p-3 bg-slate-900/40 border-l-4 border-purple-500 rounded-r-lg">
+                                <h4 class="font-bold text-white mb-0.5">2. Main OU: ແຍກສ່ວນຈັດການ</h4>
+                                <p class="leading-relaxed">ສ້າງ OU ຫຼັກຊື່ <span class="highlight-keyword">Chaleun_Staff</span> ເພື່ອຈັດເກັບພະນັກງານ ແລະ ແຍກອອກຈາກ System Objects ເກົ່າຂອງ Windows.</p>
+                            </div>
+                            <div class="p-3 bg-slate-900/40 border-l-4 border-cyan-500 rounded-r-lg">
+                                <h4 class="font-bold text-white mb-0.5">3. Sub-OU (Departments)</h4>
+                                <p class="leading-relaxed">ແບ່ງ OU ຍ່ອຍຕາມຜະແໜກ (<span class="highlight-keyword">IT</span>, <span class="highlight-keyword">HR</span>, <span class="highlight-keyword">Sales</span>) ເພື່ອສະດວກໃນການຜູກ Group Policy ທີ່ແຕກຕ່າງກັນ.</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-auto p-3 bg-indigo-950/30 border border-indigo-900/50 rounded-lg text-xs">
+                            <span class="text-indigo-400 font-bold block mb-0.5">💡 ເຄັດລັບການສອນ:</span>
+                            ອະທິບາຍໃຫ້ນັກຮຽນເຫັນພາບວ່າ OU ປຽບເໝືອນ <span class="text-white font-bold">"ລິ້ນຊັກ"</span> ທີ່ໃຊ້ຈັດລະບຽບເອກະສານ ຫາກບໍ່ມີ OU ຈະບໍ່ສາມາດຜູກ GPO ໃສ່ກຸ່ມພະນັກງານສະເພາະໄດ້.
+                        </div>
+                    </div>
+
+                    <!-- Column 2: Interactive tree / Console switcher -->
+                    <div class="lg:col-span-8 bg-slate-950/70 p-5 rounded-xl border border-slate-900 flex flex-col">
+                        <div class="flex justify-between items-center pb-2.5 border-b border-slate-800 mb-4 flex-shrink-0">
+                            <!-- Toggle switch buttons -->
+                            <div class="flex bg-slate-900 p-0.5 rounded-lg border border-slate-800">
+                                <button onclick="switchAdView('diagram')" id="btn-ad-diagram" class="px-3 py-1 rounded-md text-xs font-bold bg-indigo-600 text-white transition-all">
+                                    ແຜນວາດໂຄງສ້າງ
+                                </button>
+                                <button onclick="switchAdView('aduc')" id="btn-ad-aduc" class="px-3 py-1 rounded-md text-xs font-bold text-slate-400 hover:text-slate-200 transition-all">
+                                    Mockup ADUC Console
+                                </button>
+                            </div>
+                            <span class="text-[10px] text-slate-500 font-semibold">ກົດເລືອກ Node ເພື່ອເບິ່ງລາຍລະອຽດ</span>
+                        </div>
+
+                        <!-- Panel 1: Tree Diagram (Visible by default) -->
+                        <div id="ad-view-diagram" class="flex-1 grid grid-cols-1 md:grid-cols-12 gap-5 items-stretch min-h-[300px]">
+                            <!-- Tree visual -->
+                            <div class="md:col-span-7 bg-slate-900/40 border border-slate-800 p-4 rounded-xl flex flex-col justify-center select-none">
+                                <div class="w-full max-w-sm mx-auto space-y-4">
+                                    <!-- Domain Node -->
+                                    <div onclick="selectAdNode('domain')" id="node-domain" class="tree-node cursor-pointer border border-slate-800 bg-slate-950 p-2.5 rounded-lg text-center transition-all hover:border-indigo-500/50 flex flex-col items-center">
+                                        <span class="text-sm font-bold text-white flex items-center gap-1.5">🌐 ChaleunIT.local</span>
+                                        <span class="text-[9px] text-indigo-400 uppercase tracking-widest font-black mt-0.5">Active Directory Domain</span>
+                                    </div>
+                                    
+                                    <div class="flex justify-center -my-4"><div class="w-0.5 h-6 bg-slate-700"></div></div>
+
+                                    <!-- Main OU Node -->
+                                    <div onclick="selectAdNode('main-ou')" id="node-main-ou" class="tree-node cursor-pointer border border-slate-800 bg-slate-950 p-2.5 rounded-lg text-center transition-all hover:border-indigo-500/50 flex flex-col items-center">
+                                        <span class="text-xs font-bold text-white flex items-center gap-1.5">📁 Chaleun_Staff</span>
+                                        <span class="text-[9px] text-purple-400 uppercase tracking-widest font-black mt-0.5">Main Organizational Unit</span>
+                                    </div>
+
+                                    <div class="flex justify-center -my-4"><div class="w-0.5 h-6 bg-slate-700"></div></div>
+
+                                    <!-- Child OUs -->
+                                    <div class="grid grid-cols-3 gap-2">
+                                        <div onclick="selectAdNode('it-ou')" id="node-it-ou" class="tree-node cursor-pointer border border-slate-800 bg-slate-950 p-2 rounded-lg text-center transition-all hover:border-indigo-500/50 flex flex-col items-center">
+                                            <span class="text-[11px] font-bold text-cyan-300 flex items-center gap-1">💻 IT_Dept</span>
+                                            <span class="text-[8px] text-slate-500 font-bold uppercase mt-0.5">Sub OU</span>
+                                        </div>
+                                        <div onclick="selectAdNode('hr-ou')" id="node-hr-ou" class="tree-node cursor-pointer border border-slate-800 bg-slate-950 p-2 rounded-lg text-center transition-all hover:border-indigo-500/50 flex flex-col items-center">
+                                            <span class="text-[11px] font-bold text-rose-300 flex items-center gap-1">🤝 HR_Dept</span>
+                                            <span class="text-[8px] text-slate-500 font-bold uppercase mt-0.5">Sub OU</span>
+                                        </div>
+                                        <div onclick="selectAdNode('sales-ou')" id="node-sales-ou" class="tree-node cursor-pointer border border-slate-800 bg-slate-950 p-2 rounded-lg text-center transition-all hover:border-indigo-500/50 flex flex-col items-center">
+                                            <span class="text-[11px] font-bold text-emerald-300 flex items-center gap-1">📈 Sales_Dept</span>
+                                            <span class="text-[8px] text-slate-500 font-bold uppercase mt-0.5">Sub OU</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Details panel -->
+                            <div class="md:col-span-5 bg-slate-900/60 border border-slate-800 p-4 rounded-xl flex flex-col justify-between">
+                                <div>
+                                    <span class="text-[9px] text-indigo-400 font-bold uppercase tracking-wider block mb-1">ຂໍ້ມູນ Node ທີ່ເລືອກ</span>
+                                    <h4 id="ad-node-name" class="text-sm font-black text-white">ChaleunIT.local</h4>
+                                    <div class="border-t border-slate-800 my-2.5"></div>
+                                    
+                                    <div class="space-y-2.5 text-xs">
+                                        <div>
+                                            <span class="text-slate-500 text-[10px] block font-bold">ປະເພດວັດຖຸ (Object Type)</span>
+                                            <span id="ad-node-type" class="text-slate-300 font-semibold">Active Directory Root Domain</span>
+                                        </div>
+                                        <div>
+                                            <span class="text-slate-500 text-[10px] block font-bold">GPO ທີ່ຜູກໄວ້ (Linked GPO)</span>
+                                            <span id="ad-node-gpo" class="text-amber-400 font-semibold">Default Domain Policy</span>
+                                        </div>
+                                        <div>
+                                            <span class="text-slate-500 text-[10px] block font-bold">ບັນຊີພາຍໃນ (Members)</span>
+                                            <span id="ad-node-members" class="text-slate-400 font-mono">Administrator, Guests</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="ad-node-desc" class="p-2.5 bg-slate-950/60 border border-slate-800/80 rounded-lg text-[11px] text-slate-400 leading-relaxed mt-4">
+                                    Domain ຫຼັກ ເຮັດໜ້າທີ່ເກັບບັນຊີ User, Group ແລະ ໂຄງສ້າງຄວາມປອດໄພທັງໝົດຂອງອົງກອນ.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panel 2: ADUC Mockup (Hidden on load) -->
+                        <div id="ad-view-aduc" class="flex-1 flex border border-slate-800 rounded-xl overflow-hidden min-h-[300px] section-hidden">
+                            <!-- Left pane: Console tree folder list -->
+                            <div class="w-1/3 bg-slate-950 border-r border-slate-800 p-2 text-xs text-slate-300 overflow-y-auto select-none">
+                                <div class="font-bold text-[10px] text-slate-500 uppercase tracking-widest px-2 py-1.5">Console Tree</div>
+                                <div class="space-y-1">
+                                    <div onclick="selectAducFolder('root')" id="aduc-folder-root" class="aduc-tree-item p-1.5 rounded cursor-pointer flex items-center gap-1.5 hover:bg-slate-900 bg-slate-900 text-white font-bold">
+                                        <span>🌐</span><span class="truncate">ChaleunIT.local</span>
+                                    </div>
+                                    <div class="pl-3 space-y-0.5">
+                                        <div onclick="selectAducFolder('builtin')" id="aduc-folder-builtin" class="aduc-tree-item p-1.5 rounded cursor-pointer flex items-center gap-1.5 hover:bg-slate-900">
+                                            <span>📁</span><span class="truncate">Builtin</span>
+                                        </div>
+                                        <div onclick="selectAducFolder('computers')" id="aduc-folder-computers" class="aduc-tree-item p-1.5 rounded cursor-pointer flex items-center gap-1.5 hover:bg-slate-900">
+                                            <span>📁</span><span class="truncate">Computers</span>
+                                        </div>
+                                        <div onclick="selectAducFolder('controllers')" id="aduc-folder-controllers" class="aduc-tree-item p-1.5 rounded cursor-pointer flex items-center gap-1.5 hover:bg-slate-900">
+                                            <span>📁</span><span class="truncate">Domain Controllers</span>
+                                        </div>
+                                        <div onclick="selectAducFolder('staff')" id="aduc-folder-staff" class="aduc-tree-item p-1.5 rounded cursor-pointer flex items-center gap-1.5 hover:bg-slate-900">
+                                            <span>📁</span><span class="truncate">Chaleun_Staff</span>
+                                        </div>
+                                        <div class="pl-4 space-y-0.5">
+                                            <div onclick="selectAducFolder('it')" id="aduc-folder-it" class="aduc-tree-item p-1.5 rounded cursor-pointer flex items-center gap-1.5 hover:bg-slate-900">
+                                                <span>📁</span><span class="truncate">IT_Dept</span>
+                                            </div>
+                                            <div onclick="selectAducFolder('hr')" id="aduc-folder-hr" class="aduc-tree-item p-1.5 rounded cursor-pointer flex items-center gap-1.5 hover:bg-slate-900">
+                                                <span>📁</span><span class="truncate">HR_Dept</span>
+                                            </div>
+                                            <div onclick="selectAducFolder('sales')" id="aduc-folder-sales" class="aduc-tree-item p-1.5 rounded cursor-pointer flex items-center gap-1.5 hover:bg-slate-900">
+                                                <span>📁</span><span class="truncate">Sales_Dept</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right pane: Console list items -->
+                            <div class="flex-1 bg-slate-900/60 p-3 text-xs flex flex-col">
+                                <div class="flex justify-between items-center text-[10px] text-slate-500 font-bold mb-2 pb-1 border-b border-slate-800/80">
+                                    <span id="aduc-list-header">Name (ChaleunIT.local)</span>
+                                    <span id="aduc-list-count">7 Objects</span>
+                                </div>
+
+                                <div class="flex-1 overflow-y-auto space-y-1" id="aduc-list-container">
+                                    <!-- Dynamic elements go here -->
+                                    <div class="flex items-center justify-between p-1.5 bg-slate-950/40 rounded border border-slate-800 hover:bg-slate-900">
+                                        <div class="flex items-center gap-1.5"><span>📁</span><span class="font-bold text-white">Chaleun_Staff</span></div>
+                                        <span class="text-[10px] text-slate-500 uppercase">Organizational Unit</span>
+                                    </div>
+                                    <div class="flex items-center justify-between p-1.5 bg-slate-950/40 rounded border border-slate-800 hover:bg-slate-900">
+                                        <div class="flex items-center gap-1.5"><span>📁</span><span class="font-bold text-white">Computers</span></div>
+                                        <span class="text-[10px] text-slate-500 uppercase">Container</span>
+                                    </div>
+                                    <div class="flex items-center justify-between p-1.5 bg-slate-950/40 rounded border border-slate-800 hover:bg-slate-900">
+                                        <div class="flex items-center gap-1.5"><span>📁</span><span class="font-bold text-white">Users</span></div>
+                                        <span class="text-[10px] text-slate-500 uppercase">Container</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ======================= SECTION 2 — Group Policy (GPO) ======================= -->
+            <section id="section-gpo" class="content-section section-hidden p-6 md:p-8 max-w-7xl mx-auto">
+                <div class="mb-6 border-b border-slate-800 pb-4">
+                    <span class="bg-indigo-950 text-indigo-400 border border-indigo-800/40 px-2.5 py-0.5 rounded text-[10px] font-bold uppercase">ບົດທີ 2</span>
+                    <h2 class="text-2xl md:text-3xl font-black text-white mt-2">ການບໍລິຫານຈັດການ Group Policy Objects (GPO)</h2>
+                    <p class="text-slate-400 text-xs mt-1">ການບັງຄັບໃຊ້ກົດລະບຽບຄວາມປອດໄພ ແລະ ການຈັດການ Wallpaper ຈາກຈຸດສູນກາງ.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                    <!-- Column 1: Talking points -->
+                    <div class="lg:col-span-4 bg-slate-950/70 p-5 rounded-xl border border-slate-900 flex flex-col gap-4">
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                            <span>🗣️</span><span>ປະເດັນສຳຄັນໃນການອະທິບາຍ</span>
+                        </h3>
+                        
+                        <div class="space-y-3.5 text-xs text-slate-300">
+                            <div class="p-3 bg-slate-900/40 border-l-4 border-indigo-500 rounded-r-lg">
+                                <h4 class="font-bold text-white mb-0.5">1. GPO Link: ສ້າງແລ້ວຕ້ອງຜູກ</h4>
+                                <p class="leading-relaxed">ສ້າງກົດ (GPO) ແລ້ວ ຕ້ອງນຳໄປ <span class="highlight-keyword">Link ໃສ່ OU</span> ທີ່ຕ້ອງການ, ຫາກບໍ່ Link ຈະບໍ່ມີຜົນບັງຄັບໃຊ້.</p>
+                            </div>
+                            <div class="p-3 bg-slate-900/40 border-l-4 border-violet-500 rounded-r-lg">
+                                <h4 class="font-bold text-white mb-0.5">2. User vs Computer Policy</h4>
+                                <p class="leading-relaxed">ແຍກໃຫ້ອອກລະຫວ່າງກົດທີ່ບັງຄັບຕາມ <span class="highlight-keyword">User</span> (ເຊັ່ນ: ຫ້າມເປີດ Control Panel) ກັບ <span class="highlight-keyword">Computer</span> (ເຊັ່ນ: ປິດ Windows Update).</p>
+                            </div>
+                            <div class="p-3 bg-slate-900/40 border-l-4 border-emerald-500 rounded-r-lg">
+                                <h4 class="font-bold text-white mb-0.5">3. gpupdate /force (ຄຳສັ່ງຫຼັກ)</h4>
+                                <p class="leading-relaxed">ປົກກະຕິເຄື່ອງ client ຈະອັບເດດກົດທຸກໆ 90 ນາທີ. ເພື່ອໃຫ້ກົດມີຜົນທັນທີ ໃຫ້ເປີດ CMD ແລ້ວພິມ:</p>
+                                <div class="mt-1.5 flex items-center justify-between bg-black px-2.5 py-1.5 rounded border border-slate-800 font-mono text-[10px] text-pink-400">
+                                    <span>gpupdate /force</span>
+                                    <button onclick="copyGpoCmd(this)" class="bg-slate-800 text-[9px] px-1.5 py-0.5 rounded text-slate-300 hover:bg-slate-700">ຄັດລອກ</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Column 2: Split screen GPO Editor vs Windows Client Desktop -->
+                    <div class="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
+                        <!-- Left pane: GPO Editor Mockup on Server -->
+                        <div class="bg-slate-950/80 p-4 rounded-xl border border-slate-900 flex flex-col justify-between">
+                            <div>
+                                <div class="flex justify-between items-center pb-2 border-b border-slate-800 mb-3">
+                                    <span class="text-xs font-bold text-white flex items-center gap-1.5">🛠️ Server: GPO Editor</span>
+                                    <span class="text-[9px] bg-slate-900 text-indigo-400 px-1.5 rounded font-mono">ChaleunIT.local</span>
+                                </div>
+
+                                <div class="space-y-4 text-xs">
+                                    <!-- Policy 1 Wallpaper Toggle -->
+                                    <div class="bg-slate-900/50 p-3 rounded border border-slate-800">
+                                        <div class="flex justify-between items-center mb-1.5">
+                                            <span class="font-bold text-slate-200">1. Desktop Wallpaper GPO</span>
+                                            <span id="gpo-val-wallpaper" class="text-[9px] bg-slate-950 text-slate-500 border border-slate-800 px-1.5 py-0.5 rounded font-bold uppercase">Disabled</span>
+                                        </div>
+                                        <p class="text-[10px] text-slate-500 mb-2">ບັງຄັບຕັ້ງຮູບພື້ນຫຼັງບໍລິສັດ (C:\Wallpaper\logo.jpg)</p>
+                                        <div class="flex gap-2">
+                                            <button onclick="toggleGpoSetting('wallpaper', 'disabled')" id="btn-gpo-wp-disable" class="flex-1 py-1 rounded text-[10px] font-bold bg-slate-800 text-slate-300 transition-all border border-slate-700">Not Configured</button>
+                                            <button onclick="toggleGpoSetting('wallpaper', 'enabled')" id="btn-gpo-wp-enable" class="flex-1 py-1 rounded text-[10px] font-bold bg-slate-950 text-slate-500 transition-all border border-slate-800">Enabled</button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Policy 2 Control Panel Toggle -->
+                                    <div class="bg-slate-900/50 p-3 rounded border border-slate-800">
+                                        <div class="flex justify-between items-center mb-1.5">
+                                            <span class="font-bold text-slate-200">2. Block Control Panel GPO</span>
+                                            <span id="gpo-val-cp" class="text-[9px] bg-slate-950 text-slate-500 border border-slate-800 px-1.5 py-0.5 rounded font-bold uppercase">Disabled</span>
+                                        </div>
+                                        <p class="text-[10px] text-slate-500 mb-2">ຫ້າມເຂົ້າເຖິງ Control Panel & PC Settings ຂອງເຄື່ອງ</p>
+                                        <div class="flex gap-2">
+                                            <button onclick="toggleGpoSetting('cp', 'disabled')" id="btn-gpo-cp-disable" class="flex-1 py-1 rounded text-[10px] font-bold bg-slate-800 text-slate-300 transition-all border border-slate-700">Not Configured</button>
+                                            <button onclick="toggleGpoSetting('cp', 'enabled')" id="btn-gpo-cp-enable" class="flex-1 py-1 rounded text-[10px] font-bold bg-slate-950 text-slate-500 transition-all border border-slate-800">Enabled</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- gpupdate Trigger console inside server/client interface -->
+                            <div class="mt-4 pt-3 border-t border-slate-900">
+                                <div class="bg-black p-2.5 rounded border border-slate-800 font-mono text-[9px] text-slate-400 mb-2">
+                                    <div id="gpo-terminal-text">
+                                        C:\Users\ClientPC&gt; _
+                                    </div>
+                                </div>
+                                <button onclick="triggerGpUpdate()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs py-1.5 rounded transition-all">
+                                    🔄 Run gpupdate /force (ອັບເດດກົດໃໝ່)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Right pane: Windows Client Desktop Mockup -->
+                        <div class="bg-slate-950/80 p-4 rounded-xl border border-slate-900 flex flex-col">
+                            <div class="pb-2 border-b border-slate-800 mb-3 flex justify-between items-center flex-shrink-0">
+                                <span class="text-xs font-bold text-white flex items-center gap-1.5">💻 Client PC: Virtual Desktop</span>
+                                <span id="gpo-sync-badge" class="text-[8px] bg-emerald-950/80 text-emerald-400 border border-emerald-900 px-1 rounded font-bold uppercase">In Sync</span>
+                            </div>
+
+                            <!-- The Virtual Desktop Window -->
+                            <div id="virtual-desktop" class="win-desktop flex-1 rounded-lg border border-slate-800 overflow-hidden relative min-h-[220px] flex flex-col justify-between p-3 select-none" style="background-image: radial-gradient(circle, #1e293b 0%, #0f172a 100%);">
+                                <!-- Desktop Shortcuts Grid -->
+                                <div class="grid grid-cols-1 gap-4 w-16">
+                                    <!-- Shortcut: Control Panel -->
+                                    <div onclick="doubleClickDesktopIcon('cp')" class="flex flex-col items-center gap-1 cursor-pointer group p-1 rounded hover:bg-white/10 text-center">
+                                        <div class="text-xl">⚙️</div>
+                                        <span class="text-[9px] text-white font-semibold drop-shadow-md">Control Panel</span>
+                                    </div>
+                                    
+                                    <!-- Shortcut: Chrome -->
+                                    <div onclick="doubleClickDesktopIcon('chrome')" class="flex flex-col items-center gap-1 cursor-pointer group p-1 rounded hover:bg-white/10 text-center">
+                                        <div class="text-xl">🌐</div>
+                                        <span class="text-[9px] text-white font-semibold drop-shadow-md">Chrome</span>
+                                    </div>
+                                </div>
+
+                                <!-- Virtual Desktop Taskbar -->
+                                <div class="h-6 bg-slate-950/90 border-t border-slate-900 -mx-3 -mb-3 flex items-center justify-between px-3 text-[10px]">
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-bold text-white">Start</span>
+                                        <span class="text-slate-600">|</span>
+                                        <span class="text-slate-400">Search...</span>
+                                    </div>
+                                    <span class="text-slate-500 font-mono text-[8px]">10:00 AM</span>
+                                </div>
+
+                                <!-- Virtual Windows Popup Dialogs -->
+                                <div id="win-dialog-overlay" class="absolute inset-0 bg-black/40 flex items-center justify-center section-hidden p-4">
+                                    <!-- Alert Block Box -->
+                                    <div id="win-dialog-content" class="bg-slate-900 border border-slate-800 rounded-lg shadow-2xl p-4 max-w-[200px] w-full text-center flex flex-col items-center gap-3">
+                                        <div id="win-dialog-icon" class="text-2xl text-red-500">❌</div>
+                                        <div class="space-y-1">
+                                            <h5 id="win-dialog-title" class="text-xs font-bold text-white">Restrictions</h5>
+                                            <p id="win-dialog-text" class="text-[10px] text-slate-400 leading-relaxed">This operation has been cancelled due to restrictions in effect on this computer.</p>
+                                        </div>
+                                        <button onclick="closeWinDialog()" class="bg-slate-800 hover:bg-slate-700 text-white font-bold text-[10px] py-1 px-4 rounded w-full transition-all">OK</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ======================= SECTION 3 — Permissions (Share vs NTFS) ======================= -->
+            <section id="section-permissions" class="content-section section-hidden p-6 md:p-8 max-w-7xl mx-auto">
+                <div class="mb-6 border-b border-slate-800 pb-4">
+                    <span class="bg-indigo-950 text-indigo-400 border border-indigo-800/40 px-2.5 py-0.5 rounded text-[10px] font-bold uppercase">ບົດທີ 3</span>
+                    <h2 class="text-2xl md:text-3xl font-black text-white mt-2">ການບໍລິຫານຈັດການສິດທິໃນການເຂົ້າເຖິງ (Share vs NTFS Permissions)</h2>
+                    <p class="text-slate-400 text-xs mt-1">ຄວາມແຕກຕ່າງລະຫວ່າງປະຕູຮົ້ວເຄືອຂ່າຍ ແລະ ປະຕູຫ້ອງໄຟລ໌ລະບົບ.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                    <!-- Column 1: Talking points -->
+                    <div class="lg:col-span-4 bg-slate-950/70 p-5 rounded-xl border border-slate-900 flex flex-col gap-4">
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                            <span>🗣️</span><span>ປະເດັນສຳຄັນໃນການອະທິບາຍ</span>
+                        </h3>
+                        
+                        <div class="space-y-3.5 text-xs text-slate-300">
+                            <div class="p-3 bg-slate-900/40 border-l-4 border-blue-500 rounded-r-lg">
+                                <h4 class="font-bold text-white mb-0.5">1. Share Permission (ປະຕູຊັ້ນນອກ)</h4>
+                                <p class="leading-relaxed">ປຽບເໝືອນ "ປະຕູຮົ້ວໜ້າບ້ານ". ໃຊ້ຄຸມການເຂົ້າເຖິງຜ່ານເຄືອຂ່າຍ. ແນະນຳໃຫ້ Add ສະເພາະກຸ່ມທີ່ຕ້ອງການ ແລະ Remove 'Everyone' ອອກ.</p>
+                            </div>
+                            <div class="p-3 bg-slate-900/40 border-l-4 border-emerald-500 rounded-r-lg">
+                                <h4 class="font-bold text-white mb-0.5">2. NTFS Permission (ປະຕູຊັ້ນໃນ)</h4>
+                                <p class="leading-relaxed">ປຽບເໝືອນ "ປະຕູຫ້ອງນອນ" (Security tab). ຄຸມລະອຽດລະດັບໄຟລ໌/ໂຟນເດີ ບໍ່ວ່າຈະເຂົ້າທາງເຄືອຂ່າຍ ຫຼື ຫຼິ້ນຢູ່ໜ້າເຄື່ອງເຊີເວີ.</p>
+                            </div>
+                            <div class="p-3 bg-slate-900/40 border-l-4 border-amber-500 rounded-r-lg">
+                                <h4 class="font-bold text-white mb-0.5">3. Most Restrictive Wins!</h4>
+                                <p class="leading-relaxed">ເມື່ອສິດທິທັງສອງຂັດກັນ, <span class="highlight-keyword">ສິດທິທີ່ເຄັ່ງຄັດທີ່ສຸດ (Restricted ທີ່ສຸດ) ຈະຖືກບັງຄັບໃຊ້ສະເໝີ</span> ເຊັ່ນ: Share ເປັນ Read ແຕ່ NTFS ເປັນ Modify = ຜົນລັບຈະເປັນໄດ້ພຽງ Read.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Column 2: Two-Door Gate Simulator -->
+                    <div class="lg:col-span-8 bg-slate-950/70 p-5 rounded-xl border border-slate-900 flex flex-col justify-between">
+                        <div class="pb-2.5 border-b border-slate-800 mb-4 flex justify-between items-center flex-shrink-0">
+                            <h4 class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                                <span>🔐</span><span>ຈຳລອງລະບົບ "ປະຕູ 2 ຊັ້ນ" (Double Gate Simulator)</span>
+                            </h4>
+                            <span class="text-[9px] bg-slate-900 text-indigo-400 px-1.5 py-0.5 rounded font-bold uppercase cursor-default">Interactive 3D Gates</span>
+                        </div>
+
+                        <!-- Config controls -->
+                        <div class="grid grid-cols-3 gap-3 mb-5 text-xs">
+                            <!-- Dropdown 1: Select User -->
+                            <div>
+                                <label class="text-slate-500 text-[10px] block font-bold mb-1">1. ເລືອກ User ຜູ້ເຂົ້າເຖິງ</label>
+                                <select id="perm-sim-user" onchange="updatePermDetails()" class="w-full bg-slate-900 border border-slate-800 p-2 rounded text-slate-200 font-semibold focus:outline-none">
+                                    <option value="admin">IT Administrator (ມີສິດສູງ)</option>
+                                    <option value="hr">HR Employee (ມີສິດແດ່)</option>
+                                    <option value="guest">Anonymous Guest (ບໍ່ມີສິດ)</option>
+                                </select>
+                            </div>
+
+                            <!-- Dropdown 2: Select Target Folder -->
+                            <div>
+                                <label class="text-slate-500 text-[10px] block font-bold mb-1">2. ໂຟນເດີເປົ້າໝາຍ</label>
+                                <select id="perm-sim-folder" onchange="updatePermDetails()" class="w-full bg-slate-900 border border-slate-800 p-2 rounded text-slate-200 font-semibold focus:outline-none">
+                                    <option value="it-data">📁 IT_Secret_Data</option>
+                                    <option value="hr-data">📁 HR_Staff_Data</option>
+                                    <option value="public">📁 Public_Share</option>
+                                </select>
+                            </div>
+
+                            <!-- Action button -->
+                            <div class="flex items-end">
+                                <button onclick="runPermissionSimulation()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded transition-all text-xs flex items-center justify-center gap-1.5">
+                                    <span>▶</span><span>ທົດສອບເຂົ້າເຖິງ</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Graphical Gate Representation -->
+                        <div class="bg-slate-900/40 border border-slate-800 p-5 rounded-xl flex flex-col items-center justify-center min-h-[220px] select-none relative overflow-hidden">
+                            <!-- Avatar representation -->
+                            <div id="perm-user-avatar" class="absolute left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-indigo-600 border-2 border-indigo-400 flex items-center justify-center text-xl shadow-lg z-10 transition-all duration-1000">
+                                👤
+                            </div>
+
+                            <!-- Gates container -->
+                            <div class="flex gap-14 items-center justify-center w-full max-w-md pl-12 pr-6">
+                                <!-- Gate 1: Share -->
+                                <div class="flex-1 flex flex-col items-center relative gap-3">
+                                    <span class="text-[9px] font-black text-blue-400 uppercase tracking-widest">Gate 1: Share</span>
+                                    <div class="w-12 h-20 bg-slate-950 border border-slate-800 rounded-md relative shadow-inner overflow-hidden door-perspective">
+                                        <div id="gate-door-share" class="gate-door absolute inset-0 bg-gradient-to-tr from-blue-900 to-blue-600 border border-blue-400/80 rounded flex items-center justify-center text-xl shadow-lg">🚪</div>
+                                    </div>
+                                    <div id="gate-share-status" class="text-[9px] text-slate-500 font-bold">CLOSE</div>
+                                </div>
+
+                                <!-- Arrow -->
+                                <div class="text-xl text-slate-700 font-bold">➔</div>
+
+                                <!-- Gate 2: NTFS -->
+                                <div class="flex-1 flex flex-col items-center relative gap-3">
+                                    <span class="text-[9px] font-black text-emerald-400 uppercase tracking-widest">Gate 2: NTFS</span>
+                                    <div class="w-12 h-20 bg-slate-950 border border-slate-800 rounded-md relative shadow-inner overflow-hidden door-perspective">
+                                        <div id="gate-door-ntfs" class="gate-door absolute inset-0 bg-gradient-to-tr from-emerald-900 to-emerald-600 border border-emerald-400/80 rounded flex items-center justify-center text-xl shadow-lg">🔐</div>
+                                    </div>
+                                    <div id="gate-ntfs-status" class="text-[9px] text-slate-500 font-bold">LOCKED</div>
+                                </div>
+
+                                <!-- Target -->
+                                <div class="flex flex-col items-center gap-2">
+                                    <span class="text-[9px] font-black text-slate-400 uppercase">Target</span>
+                                    <div class="w-12 h-14 bg-slate-900 border border-dashed border-slate-700 rounded-lg flex items-center justify-center text-2xl shadow-md">
+                                        🎁
+                                    </div>
+                                    <span class="text-[9px] text-slate-500 font-bold">Data</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Effective Permissions calculation and summary explanation -->
+                        <div class="mt-4 grid grid-cols-1 md:grid-cols-12 gap-3 text-xs items-center">
+                            <!-- Formula Display -->
+                            <div class="md:col-span-8 bg-slate-900/60 p-3 rounded-lg border border-slate-800 space-y-1">
+                                <span class="text-[10px] text-slate-500 font-bold block">ວິເຄາະສິດທິ effective permissions</span>
+                                <div class="flex items-center gap-2 font-mono text-[11px] text-indigo-400 font-bold flex-wrap">
+                                    <span id="formula-share">Share (Change)</span>
+                                    <span class="text-slate-600 font-sans">∩</span>
+                                    <span id="formula-ntfs">NTFS (Full Control)</span>
+                                    <span class="text-slate-600 font-sans">=</span>
+                                    <span id="formula-result" class="text-emerald-400">Effective: Modify</span>
+                                </div>
+                            </div>
+
+                            <!-- Summary Alert Badge -->
+                            <div class="md:col-span-4 h-full">
+                                <div id="perm-summary-banner" class="h-full flex items-center justify-center p-3 rounded-lg border text-center font-bold bg-slate-900 border-slate-800 text-slate-400">
+                                    ລໍຖ້າການທົດສອບ...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ======================= SECTION 4 — FSRM & Optimization ======================= -->
+            <section id="section-fsrm" class="content-section section-hidden p-6 md:p-8 max-w-7xl mx-auto">
+                <div class="mb-6 border-b border-slate-800 pb-4">
+                    <span class="bg-indigo-950 text-indigo-400 border border-indigo-800/40 px-2.5 py-0.5 rounded text-[10px] font-bold uppercase">ບົດທີ 4</span>
+                    <h2 class="text-2xl md:text-3xl font-black text-white mt-2">ການເພີ່ມປະສິດທິພາບ File Server (FSRM Tools)</h2>
+                    <p class="text-slate-400 text-xs mt-1">ການຄວບຄຸມການນຳໃຊ້ພື້ນທີ່ ແລະ ຄວາມປອດໄພລະດັບ File Server.</p>
+                </div>
+
+                <!-- Small intro talking banner -->
+                <div class="bg-slate-950/60 border border-slate-900 p-3.5 rounded-xl flex gap-3.5 items-start mb-6">
+                    <div class="w-9 h-9 rounded-lg bg-indigo-950 border border-indigo-900 flex items-center justify-center text-xl flex-shrink-0">🚀</div>
+                    <div class="text-xs">
+                        <h4 class="font-bold text-white mb-0.5">🗣️ ປະເດັນສຳຄັນໃນການອະທິບາຍ: FSRM (File Server Resource Manager)</h4>
+                        <p class="text-slate-400 leading-relaxed">ໃຊ້ປ້ອງກັນບໍ່ໃຫ້ Disk ເຕັມໄວຈາກໄຟລ໌ເພງ/ໜັງ, ຊ່ອນໂຟນເດີທີ່ບໍ່ມີສິດເຫັນເພື່ອຄວາມປອດໄພ ແລະ ຕັ້ງຄ່າກູ້ຄືນໄຟລ໌ເມື່ອຖືກລຶບ.</p>
+                    </div>
+                </div>
+
+                <!-- 4 Interactive Mini Simulators Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <!-- Simulator 1: Quota Management -->
+                    <div class="bg-slate-950/70 p-5 rounded-xl border border-slate-900 flex flex-col justify-between min-h-[220px]">
+                        <div>
+                            <h4 class="text-xs font-black text-white border-b border-slate-900 pb-2 mb-3 flex items-center gap-1.5">
+                                <span>📊</span><span>1. ຈຳກັດພື້ນທີ່ (Quota Management)</span>
+                            </h4>
+                            <p class="text-[11px] text-slate-400 mb-4 leading-relaxed"><strong>ໂຈດ:</strong> ບັງຄັບ Quota ໃນໂຟນເດີ <code class="bg-slate-900 px-1 py-0.5 rounded text-pink-400">IT_Data</code> ຫ້າມເກີນ <strong>100 MB</strong> (Hard Quota).</p>
+                            
+                            <div class="bg-slate-900/60 p-3.5 rounded-lg border border-slate-800 space-y-2.5">
+                                <div class="flex justify-between text-[10px] font-bold">
+                                    <span class="text-slate-400">ພື້ນທີ່ທີ່ໃຊ້ (Used Space)</span>
+                                    <span id="quota-badge" class="text-indigo-400">70 MB / 100 MB (70%)</span>
+                                </div>
+                                <div class="w-full bg-slate-950 border border-slate-800 rounded-full h-2.5 overflow-hidden">
+                                    <div id="quota-progress" class="bg-indigo-500 h-full rounded-full transition-all duration-300" style="width: 70%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Quota Error Banner (shown when exceeded) -->
+                            <div id="quota-error-banner" class="section-hidden mt-2 p-2.5 bg-red-950/30 border border-red-900/60 rounded-lg text-[10px] text-red-400 font-bold text-center">
+                                ❌ Error: Disk quota exceeded on 'IT_Data'. Hard Quota active — ໄຟລ໌ຖືກ Block ທັນທີ!
+                            </div>
+
+                        <!-- Action controls -->
+                        <div class="mt-4 flex items-center gap-3">
+                            <button onclick="addQuotaSpace(15)" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold text-[10px] py-1.5 rounded transition-all border border-slate-800 hover:border-indigo-500/30">
+                                📁 Upload ໄຟລ໌ (+15MB)
+                            </button>
+                            <button onclick="addQuotaSpace(25)" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold text-[10px] py-1.5 rounded transition-all border border-slate-800 hover:border-indigo-500/30">
+                                📁 Upload ໄຟລ໌ (+25MB)
+                            </button>
+                            <button onclick="resetQuotaSpace()" class="bg-slate-800 hover:bg-slate-700 text-slate-400 text-[10px] px-3 py-1.5 rounded transition-all">
+                                Reset
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Simulator 2: File Screening -->
+                    <div class="bg-slate-950/70 p-5 rounded-xl border border-slate-900 flex flex-col justify-between min-h-[220px]">
+                        <div>
+                            <h4 class="text-xs font-black text-white border-b border-slate-900 pb-2 mb-3 flex items-center gap-1.5">
+                                <span>⛔</span><span>2. ບລັອກໄຟລ໌ (File Screening)</span>
+                            </h4>
+                            <p class="text-[11px] text-slate-400 mb-3 leading-relaxed"><strong>ໂຈດ:</strong> ຕັ້ງກົດຫ້າມເຊບໄຟລ໌ປະເພດ Audio/Video (Block Audio and Video Files).</p>
+
+                            <div class="grid grid-cols-3 gap-2">
+                                <button onclick="testFileScreen('work.docx')" class="flex flex-col items-center gap-1 p-2 bg-slate-900/60 hover:bg-slate-900 border border-slate-800 rounded-lg transition-all group">
+                                    <span class="text-2xl group-hover:scale-105 transition-transform">📄</span>
+                                    <span class="text-[9px] text-slate-300 font-mono">work.docx</span>
+                                </button>
+                                <button onclick="testFileScreen('song.mp3')" class="flex flex-col items-center gap-1 p-2 bg-slate-900/60 hover:bg-slate-900 border border-slate-800 rounded-lg transition-all group">
+                                    <span class="text-2xl group-hover:scale-105 transition-transform">🎵</span>
+                                    <span class="text-[9px] text-slate-300 font-mono">song.mp3</span>
+                                </button>
+                                <button onclick="testFileScreen('movie.mp4')" class="flex flex-col items-center gap-1 p-2 bg-slate-900/60 hover:bg-slate-900 border border-slate-800 rounded-lg transition-all group">
+                                    <span class="text-2xl group-hover:scale-105 transition-transform">🎬</span>
+                                    <span class="text-[9px] text-slate-300 font-mono">movie.mp4</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Result text box -->
+                        <div class="mt-4 p-2.5 bg-slate-900/50 rounded-lg border border-slate-800 text-center min-h-[38px] flex items-center justify-center">
+                            <span id="screen-result" class="text-[10px] text-slate-500">ຄລິກທີ່ໄຟລ໌ດ້ານເທິງເພື່ອທົດລອງ Upload ໄປຫາ Server</span>
+                        </div>
+                    </div>
+
+                    <!-- Simulator 3: Access-Based Enumeration (ABE) -->
+                    <div class="bg-slate-950/70 p-5 rounded-xl border border-slate-900 flex flex-col justify-between min-h-[220px]">
+                        <div>
+                            <div class="flex justify-between items-center border-b border-slate-900 pb-2 mb-3">
+                                <h4 class="text-xs font-black text-white flex items-center gap-1.5">
+                                    <span>👻</span><span>3. ຊ່ອນໂຟນເດີ (ABE)</span>
+                                </h4>
+                                <!-- Toggle ABE switch button -->
+                                <button onclick="toggleAbeSwitch()" id="btn-abe-toggle" class="bg-slate-900 hover:bg-slate-800 text-[10px] font-bold text-slate-400 px-3 py-1 rounded border border-slate-800 flex items-center gap-1.5 transition-all">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-slate-600"></span><span>ABE: OFF</span>
+                                </button>
+                            </div>
+                            <p class="text-[11px] text-slate-400 mb-3 leading-relaxed"><strong>Access-Based Enumeration:</strong> ຫາກພະນັກງານບໍ່ມີສິດ, ໂຟນເດີຈະຫາຍໄປ ບໍ່ແມ່ນເຫັນແຕ່ເຂົ້າບໍ່ໄດ້.</p>
+
+                            <!-- Virtual Explorer container -->
+                            <div class="bg-slate-900/40 border border-slate-800 p-2.5 rounded-lg text-[10px]">
+                                <span class="text-slate-500 font-bold block mb-2">ທັດສະນະຂອງ Sales User ເມື່ອເປີດ File Server:</span>
+                                <div class="flex gap-6 justify-center items-center py-1">
+                                    <!-- Sales Folder (Visible) -->
+                                    <div class="flex flex-col items-center">
+                                        <div class="text-3xl">📁</div>
+                                        <span class="font-bold text-slate-200 mt-1">Sales_Shared</span>
+                                        <span class="text-[8px] text-emerald-500 mt-0.5">(ມີສິດເຂົ້າເຖິງ)</span>
+                                    </div>
+                                    <!-- HR Folder (ABE dependent) -->
+                                    <div id="abe-hr-folder" class="flex flex-col items-center transition-all duration-300">
+                                        <div class="relative">
+                                            <div class="text-3xl text-slate-400">📁</div>
+                                            <span class="absolute -top-1 -right-1 bg-red-600 w-3.5 h-3.5 rounded-full flex items-center justify-center text-[8px] text-white border border-slate-900 font-bold">🔐</span>
+                                        </div>
+                                        <span class="font-bold text-slate-400 mt-1">HR_Secret</span>
+                                        <span class="text-[8px] text-rose-500 mt-0.5">(ບໍ່ມີສິດເຂົ້າເຖິງ)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="abe-explain-text" class="mt-4 text-[10px] text-center text-slate-500 leading-relaxed">
+                            Sales User ຍັງເຫັນໂຟນເດີ HR ຢູ່ (ແຕ່ດັບເບິນຄລິກເຂົ້າຈະຂຶ້ນ Access Denied).
+                        </div>
+                    </div>
+
+                    <!-- Simulator 4: Shadow Copies -->
+                    <div class="bg-slate-950/70 p-5 rounded-xl border border-slate-900 flex flex-col justify-between min-h-[220px]">
+                        <div>
+                            <h4 class="text-xs font-black text-white border-b border-slate-900 pb-2 mb-3 flex items-center gap-1.5">
+                                <span>⏳</span><span>4. ຍ້ອນເວລາ (Volume Shadow Copies)</span>
+                            </h4>
+                            <p class="text-[11px] text-slate-400 mb-3.5 leading-relaxed"><strong> Shadow Copies:</strong> ຖ້າ User ແກ້ໄຂຜິດ ຫຼື ໄຟລ໌ເສຍຫາຍ ສາມາດ Restore ຍ້ອນເວລາດຶງໄຟລ໌ເກົ່າຄືນມາໄດ້.</p>
+
+                            <div class="bg-slate-900/60 border border-slate-800 p-2.5 rounded-lg grid grid-cols-12 gap-3 text-[10px]">
+                                <!-- File Preview -->
+                                <div class="col-span-7 bg-slate-950 p-2 rounded border border-slate-800 flex flex-col gap-1 min-h-[60px]">
+                                    <span class="text-slate-500 text-[8px] font-bold">report.txt (File content)</span>
+                                    <span id="shadow-file-content" class="text-rose-400 font-mono italic">ຂໍ້ມູນຖືກລຶບ / ໄຟລ໌ເສຍຫາຍ...</span>
+                                </div>
+
+                                <!-- Backups Version list -->
+                                <div class="col-span-5 flex flex-col gap-1.5">
+                                    <button onclick="restoreShadowVersion('9am')" class="bg-slate-950 hover:bg-slate-900 text-slate-300 p-1.5 rounded border border-slate-800 text-[9px] font-semibold transition-all">
+                                        ⏪ Snapshot 09:00 AM
+                                    </button>
+                                    <button onclick="restoreShadowVersion('10am')" class="bg-slate-950 hover:bg-slate-900 text-slate-300 p-1.5 rounded border border-slate-800 text-[9px] font-semibold transition-all">
+                                        ⏪ Snapshot 10:00 AM
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Feedback status -->
+                        <div id="shadow-status-banner" class="mt-4 text-[10px] text-center text-slate-500 italic">
+                            ຄລິກເລືອກ Snapshot ດ້ານຂວາ ເພື່ອທົດສອບ Restore ຂໍ້ມູນ
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- ======================= FLOATING PRESENTATION DOCK ======================= -->
+    <div id="presentation-dock"
+         class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 bg-slate-950/90 backdrop-blur-md text-white px-4 py-2.5 rounded-xl shadow-2xl shadow-black border border-slate-900 flex items-center gap-3">
+        <!-- Badge label -->
+        <div class="flex items-center gap-1.5 border-r border-slate-800 pr-3">
+            <span class="text-base">🖥️</span>
+            <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 hidden sm:block">Presenter Tool</span>
+        </div>
+
+        <!-- Toggle fullscreen -->
+        <button onclick="toggleSidebarCollapse()" id="btn-sidebar-toggle"
+            class="flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-bold transition-all border border-slate-800">
+            <span>📺</span><span id="sidebar-toggle-text">ເຕັມຈໍ</span>
+        </button>
+
+        <!-- Font Zoom controls -->
+        <div class="flex items-center gap-1 bg-slate-900/60 p-0.5 rounded-lg border border-slate-800">
+            <button onclick="adjustScale(-0.1)" title="ຫຼຸດຕົວໜັງສື"
+                class="w-7 h-7 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-white rounded font-bold text-xs transition-all">−A</button>
+            <span id="font-scale-text" class="text-[10px] font-mono px-2 min-w-[38px] text-center text-indigo-400 font-extrabold">100%</span>
+            <button onclick="adjustScale(0.1)" title="ເພີ່ມຕົວໜັງສື"
+                class="w-7 h-7 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-white rounded font-bold text-xs transition-all">+A</button>
+        </div>
+
+        <!-- Reset simulators status -->
+        <button onclick="resetGlobalSimulators()" title="ຣີເຊັດເຄື່ອງມືທັງໝົດ"
+            class="w-7 h-7 flex items-center justify-center bg-slate-900 hover:bg-red-950/40 text-slate-400 hover:text-red-400 rounded-lg transition-all border border-slate-800">🔄</button>
+    </div>
+
+    <!-- ======================= SCRIPTS ======================= -->
+    <script>
+    // --- Global View State ---
+    let fontScale = 1;
+    let sidebarCollapsed = false;
+    
+    // --- Section titles for top header bar ---
+    const HEADER_TITLES = {
+        'section-network': 'ບົດນຳ: ການກຽມຄວາມພ້ອມ (Static IP)',
+        'section-ad': 'ບົດທີ 1: ການອອກແບບໂຄງສ້າງອົງກອນ (AD Hierarchy)',
+        'section-gpo': 'ບົດທີ 2: ການບໍລິຫານຈັດການ Group Policy (GPO)',
+        'section-permissions': 'ບົດທີ 3: ການຈັດການສິດທິເຂົ້າເຖິງ (Share vs NTFS)',
+        'section-fsrm': 'ບົດທີ 4: ການເພີ່ມປະສິດທິພາບ File Server (FSRM)'
+    };
+
+    function showSection(id) {
+        // Hide existing sections
+        document.querySelectorAll('.content-section').forEach(sec => {
+            sec.classList.add('section-hidden');
+            sec.style.opacity = '0';
+        });
+
+        // Show target section
+        const target = document.getElementById(id);
+        if (target) {
+            target.classList.remove('section-hidden');
+            requestAnimationFrame(() => { target.style.opacity = '1'; });
+        }
+
+        // Update header & active nav button style
+        document.getElementById('current-header-title').textContent = HEADER_TITLES[id] || '';
+        
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            const isTarget = btn.getAttribute('data-target') === id;
+            if (isTarget) {
+                btn.className = "nav-btn active-nav w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-left font-semibold text-xs transition-all bg-indigo-600/10 border-l-4 border-indigo-500 text-white shadow glow-active";
+            } else {
+                btn.className = "nav-btn w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-left font-semibold text-xs transition-all text-slate-400 hover:bg-slate-900/60 hover:text-slate-200 border-l-4 border-transparent";
+            }
+        });
+
+        // Reset scroll position
+        document.querySelector('main').scrollTop = 0;
+    }
+
+    // --- Presentation Controls ---
+    function toggleSidebarCollapse() {
+        sidebarCollapsed = !sidebarCollapsed;
+        const sidebar = document.getElementById('sidebar-nav');
+        sidebar.classList.toggle('sidebar-collapsed', sidebarCollapsed);
+
+        const btnText = document.getElementById('sidebar-toggle-text');
+        
+        if (sidebarCollapsed) {
+            btnText.textContent = "ປິດ";
+            adjustScale(0.2); // Auto scale font up in presentation mode
+        } else {
+            btnText.textContent = "ເຕັມຈໍ";
+            fontScale = 1;
+            document.documentElement.style.setProperty('--font-scale', 1);
+            document.getElementById('font-scale-text').textContent = '100%';
+        }
+    }
+
+    function adjustScale(delta) {
+        fontScale = Math.min(1.8, Math.max(0.8, +(fontScale + delta).toFixed(1)));
+        document.documentElement.style.setProperty('--font-scale', fontScale);
+        document.getElementById('font-scale-text').textContent = Math.round(fontScale * 100) + '%';
+    }
+
+    function resetGlobalSimulators() {
+        // Reset Section 0
+        resetPingSim();
+        switchIpSimMode('static');
+        document.querySelectorAll("input[name='ip-type']")[1].checked = true;
+
+        // Reset Section 1
+        selectAdNode('domain');
+        switchAdView('diagram');
+
+        // Reset Section 2
+        gpoSettings = { wallpaper: 'disabled', cp: 'disabled' };
+        updateGpoUi();
+        document.getElementById('gpo-terminal-text').innerHTML = "C:\\Users\\ClientPC&gt; _";
+        document.getElementById('virtual-desktop').style.backgroundImage = "radial-gradient(circle, #1e293b 0%, #0f172a 100%)";
+        closeWinDialog();
+
+        // Reset Section 3
+        document.getElementById('perm-sim-user').selectedIndex = 0;
+        document.getElementById('perm-sim-folder').selectedIndex = 0;
+        updatePermDetails();
+        resetPermissionGates();
+
+        // Reset Section 4
+        resetQuotaSpace();
+        document.getElementById('screen-result').className = "text-[10px] text-slate-500";
+        document.getElementById('screen-result').textContent = "ຄລິກທີ່ໄຟລ໌ດ້ານເທິງເພື່ອທົດລອງ Upload ໄປຫາ Server";
+        
+        abeOn = false;
+        const folder = document.getElementById('abe-hr-folder');
+        folder.style.opacity = '1';
+        folder.style.transform = 'scale(1)';
+        document.getElementById('btn-abe-toggle').className = "bg-slate-900 hover:bg-slate-800 text-[10px] font-bold text-slate-400 px-3 py-1 rounded border border-slate-800 flex items-center gap-1.5 transition-all";
+        document.getElementById('btn-abe-toggle').innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-slate-600"></span><span>ABE: OFF</span>`;
+        document.getElementById('abe-explain-text').textContent = "Sales User ຍັງເຫັນໂຟນເດີ HR ຢູ່ (ແຕ່ດັບເບິນຄລິກເຂົ້າຈະຂຶ້ນ Access Denied).";
+
+        document.getElementById('shadow-file-content').textContent = "ຂໍ້ມູນຖືກລຶບ / ໄຟລ໌ເສຍຫາຍ...";
+        document.getElementById('shadow-file-content').className = "text-rose-400 font-mono italic";
+        document.getElementById('shadow-status-banner').textContent = "ຄລິກເລືອກ Snapshot ດ້ານຂວາ ເພື່ອທົດສອບ Restore ຂໍ້ມູນ";
+        document.getElementById('shadow-status-banner').className = "mt-4 text-[10px] text-center text-slate-500 italic";
+    }
+
+    // --- Section 0: Network / IP Simulator ---
+    const IP_TOOLTIPS = {
+        'ip': {
+            title: 'IP Address: 192.168.100.10',
+            text: 'ໝາຍເລກປະຈຳເຄື່ອງເຊີເວີ ເປັນ Static IP ຄົງທີ່ ເພື່ອບໍ່ໃຫ້ຫຼົງກັບ client ແລະ ຊ່ວຍໃຫ້ AD/DNS ເຮັດວຽກສະໝ່ຳສະເໝີ.'
+        },
+        'subnet': {
+            title: 'Subnet Mask: 255.255.255.0',
+            text: 'ຕົວກຳນົດຂອບເຂດ Network (Class C) ຊ່ວຍໃຫ້ເຊີເວີຮູ້ວ່າ IP ໃດແດ່ທີ່ຢູ່ໃນເຄືອຂ່າຍດຽວກັນ.'
+        },
+        'gateway': {
+            title: 'Default Gateway: 192.168.100.2',
+            text: 'ໝາຍເລກ IP ຂອງ VMware NAT Interface ທີ່ເຊີເວີຕ້ອງສົ່ງຂໍ້ມູນໄປຫາ ເມື່ອຕ້ອງການອອກໄປຫາ Internet.'
+        },
+        'dns': {
+            title: 'Preferred DNS: 127.0.0.1 (Loopback)',
+            text: 'ບັງຄັບໃຫ້ເຄື່ອງ Windows Server ສອບຖາມຊື່ Domain ຈາກຕົວເອງ ເພາະເຄື່ອງນີ້ເປັນ DNS Server ຂອງລະບົບ AD.'
+        }
+    };
+
+    function switchIpSimMode(mode) {
+        const fields = document.getElementById('ip-fields-container');
+        const alertBox = document.getElementById('ip-sim-alert');
+        
+        if (mode === 'dhcp') {
+            fields.style.opacity = '0.35';
+            fields.style.pointerEvents = 'none';
+            alertBox.className = "p-3 bg-red-950/20 border border-red-900/50 text-red-400 rounded-lg";
+            alertBox.innerHTML = `
+                <strong class="font-bold flex items-center gap-1.5"><span class="text-red-500">⚠️</span> <span>ຜິດພາດ: ຫ້າມໃຊ້ DHCP!</span></strong>
+                <p class="mt-0.5 text-slate-350 text-[11px]">ຖ້າໃຊ້ DHCP, ເມື່ອເປີດເຊີເວີຂຶ້ນມາໃໝ່ IP ອາດຈະປ່ຽນແປງ ເຮັດໃຫ້ client ບໍ່ສາມາດ join domain ແລະ ລະບົບ DNS ທັງໝົດຈະໃຊ້ງານບໍ່ໄດ້.</p>
+            `;
+        } else {
+            fields.style.opacity = '1';
+            fields.style.pointerEvents = 'auto';
+            alertBox.className = "p-3 bg-emerald-950/20 border border-emerald-900/50 text-emerald-400 rounded-lg";
+            alertBox.innerHTML = `
+                <strong class="font-bold flex items-center gap-1.5"><span class="text-emerald-500">✅</span> <span>ພ້ອມຕິດຕັ້ງ:</span></strong>
+                <p class="mt-0.5 text-slate-350 text-[11px]">IP ຄົງທີ່ (Static IP) ຖືກຕ້ອງຕາມມາດຕະຖານ, ພ້ອມສຳລັບຕິດຕັ້ງ Active Directory Domain Services.</p>
+            `;
+        }
+    }
+
+    function showIpTooltip(key) {
+        const data = IP_TOOLTIPS[key];
+        if (!data) return;
+        const alertBox = document.getElementById('ip-sim-alert');
+        alertBox.className = "p-3 bg-indigo-950/40 border border-indigo-900/60 text-indigo-300 rounded-lg transition-all duration-300";
+        alertBox.innerHTML = `
+            <strong class="font-bold flex items-center gap-1 block text-indigo-200">💡 ${data.title}</strong>
+            <p class="mt-0.5 text-slate-300 text-[11px] leading-relaxed">${data.text}</p>
+        `;
+    }
+
+    let pingTimer = null;
+    function triggerPingSim() {
+        // Cancel existing
+        if (pingTimer) clearInterval(pingTimer);
+        
+        const path1 = document.getElementById('ping-path-1');
+        const path2 = document.getElementById('ping-path-2');
+        const statusLabel = document.getElementById('ping-status-label');
+        const term = document.getElementById('ping-terminal-text');
+
+        // Check if DHCP selected
+        const isDhcp = document.querySelectorAll("input[name='ip-type']")[0].checked;
+
+        if (isDhcp) {
+            statusLabel.textContent = "Ping Failed (No Gateway)";
+            statusLabel.className = "text-[10px] text-red-500 mt-2 font-bold uppercase tracking-wider animate-pulse";
+            term.innerHTML = `
+                <span class="text-indigo-400">C:\\Users\\Administrator&gt; ping 8.8.8.8</span><br>
+                <span class="text-red-400">Transmit failed. General failure.</span><br>
+                <span class="text-slate-500">C:\\Users\\Administrator&gt; _</span>
+            `;
+            return;
+        }
+
+        // Animate NAT lines
+        path1.classList.add('ping-line-active');
+        path1.setAttribute('stroke', '#4f46e5');
+        
+        statusLabel.textContent = "Sending Ping Packets...";
+        statusLabel.className = "text-[10px] text-indigo-400 mt-2 font-bold uppercase tracking-wider";
+        term.innerHTML = `<span class="text-indigo-400">C:\\Users\\Administrator&gt; ping google.com</span><br>`;
+
+        let lines = [
+            "Pinging google.com [142.250.207.46] with 32 bytes of data:",
+            "Reply from 142.250.207.46: bytes=32 time=8ms TTL=118",
+            "Reply from 142.250.207.46: bytes=32 time=7ms TTL=118",
+            "Reply from 142.250.207.46: bytes=32 time=8ms TTL=118",
+            "Reply from 142.250.207.46: bytes=32 time=9ms TTL=118",
+            "Ping statistics: Sent = 4, Received = 4, Lost = 0 (0% loss)",
+            "<span class='text-emerald-400 font-bold'>Success: Internet access OK (VMware NAT)!</span>",
+            "C:\\Users\\Administrator&gt; _"
+        ];
+
+        let idx = 0;
+        pingTimer = setInterval(() => {
+            if (idx === 2) {
+                // Packet reached Gateway, now activating Gateway -> Internet path
+                path2.classList.add('ping-line-active');
+                path2.setAttribute('stroke', '#10b981');
+            }
+
+            if (idx < lines.length) {
+                term.innerHTML += lines[idx] + "<br>";
+                idx++;
+            } else {
+                clearInterval(pingTimer);
+                statusLabel.textContent = "Ping Success (NAT Connected)";
+                statusLabel.className = "text-[10px] text-emerald-400 mt-2 font-bold uppercase tracking-wider";
+                path1.classList.remove('ping-line-active');
+                path2.classList.remove('ping-line-active');
+            }
+        }, 400);
+    }
+
+    function resetPingSim() {
+        if (pingTimer) clearInterval(pingTimer);
+        document.getElementById('ping-path-1').classList.remove('ping-line-active');
+        document.getElementById('ping-path-1').setAttribute('stroke', '#334155');
+        document.getElementById('ping-path-2').classList.remove('ping-line-active');
+        document.getElementById('ping-path-2').setAttribute('stroke', '#334155');
+        document.getElementById('ping-status-label').textContent = "ລໍຖ້າການທົດສອບ Ping";
+        document.getElementById('ping-status-label').className = "text-[10px] text-slate-500 mt-2 font-bold uppercase tracking-wider";
+        document.getElementById('ping-terminal-text').innerHTML = `<span class="text-slate-500">C:\\Users\\Administrator&gt;_</span>`;
+    }
+
+
+    // --- Section 1: Active Directory Details & Console ---
+    const AD_NODE_DATA = {
+        'domain': {
+            name: 'ChaleunIT.local',
+            type: 'Active Directory Root Domain',
+            gpo: 'Default Domain Policy',
+            members: 'Administrator, Guest, KR-Server$',
+            desc: 'ລະດັບສູງສຸດຂອງໂຄງສ້າງລະບົບບໍລິສັດ ໃຊ້ເກັບບັນຊີ User, Group, Computers ແລະ ເປັນຂອບເຂດຄວາມປອດໄພຫຼັກ (Security Boundary).'
+        },
+        'main-ou': {
+            name: 'Chaleun_Staff (OU)',
+            type: 'Main Organizational Unit',
+            gpo: 'Company Wallpaper GPO',
+            members: 'IT_Dept, HR_Dept, Sales_Dept (Sub OUs)',
+            desc: 'OU ຫຼັກທີ່ສ້າງຂຶ້ນເພື່ອເກັບພະນັກງານທັງໝົດຂອງບໍລິສັດ ຈະເລີນໄອທີ ເພື່ອຫຼີກລ່ຽງການໃຊ້ໂຟນເດີ Users ຫຼັກຂອງ Windows ທີ່ບໍ່ສາມາດຜູກ GPO ໄດ້.'
+        },
+        'it-ou': {
+            name: 'IT_Dept (OU)',
+            type: 'Sub Organizational Unit (Department)',
+            gpo: 'Local Admin GPO, IT Firewall Rules',
+            members: 'it_admin, it_support, IT_Specialists (Group)',
+            desc: 'OU ຍ່ອຍສຳລັບຜະແໜກໄອທີ ເພື່ອບັງຄັບໃຊ້ນະໂຍບາຍພິເສດ ເຊັ່ນ ການເປີດສິດ Local Admin ຫຼື ການອະນຸຍາດເຄື່ອງມືພັດທະນາລະບົບ.'
+        },
+        'hr-ou': {
+            name: 'HR_Dept (OU)',
+            type: 'Sub Organizational Unit (Department)',
+            gpo: 'HR Restricted GPO (Block Control Panel)',
+            members: 'hr_manager, hr_officer, HR_Staff (Group)',
+            desc: 'OU ຍ່ອຍຂອງຜະແໜກຊັບພະຍາກອນມະນຸດ ໃຊ້ບັງຄັບໃຊ້ກົດລະບຽບຄວາມປອດໄພທີ່ເຂັ້ມງວດກວ່າພະນັກງານທົ່ວໄປ ເພື່ອປົກປ້ອງຂໍ້ມູນບຸກຄົນ.'
+        },
+        'sales-ou': {
+            name: 'Sales_Dept (OU)',
+            type: 'Sub Organizational Unit (Department)',
+            gpo: 'Sales Drive Map Policy, Internet Limit',
+            members: 'sales_lead, sales_rep1, Sales_Force (Group)',
+            desc: 'OU ຍ່ອຍຂອງຜະແໜກຝ່າຍຂາຍ ໃຊ້ບັງຄັບການ map Network Drive ຂອງ Sales ໂດຍອັດຕະໂນມັດ ເມື່ອ Login ເຂົ້າສູ່ລະບົບ.'
+        }
+    };
+
+    function selectAdNode(key) {
+        document.querySelectorAll('.tree-node').forEach(node => {
+            node.classList.remove('tree-node-selected', 'glow-active');
+        });
+        
+        const selected = document.getElementById(`node-${key}`);
+        if (selected) {
+            selected.classList.add('tree-node-selected', 'glow-active');
+        }
+
+        const data = AD_NODE_DATA[key];
+        if (data) {
+            document.getElementById('ad-node-name').textContent = data.name;
+            document.getElementById('ad-node-type').textContent = data.type;
+            document.getElementById('ad-node-gpo').textContent = data.gpo;
+            document.getElementById('ad-node-members').textContent = data.members;
+            document.getElementById('ad-node-desc').textContent = data.desc;
+        }
+    }
+
+    function switchAdView(view) {
+        const btnDiag = document.getElementById('btn-ad-diagram');
+        const btnAduc = document.getElementById('btn-ad-aduc');
+        const pnlDiag = document.getElementById('ad-view-diagram');
+        const pnlAduc = document.getElementById('ad-view-aduc');
+
+        if (view === 'diagram') {
+            pnlDiag.classList.remove('section-hidden');
+            pnlAduc.classList.add('section-hidden');
+            btnDiag.className = "px-3 py-1 rounded-md text-xs font-bold bg-indigo-600 text-white transition-all";
+            btnAduc.className = "px-3 py-1 rounded-md text-xs font-bold text-slate-400 hover:text-slate-200 transition-all";
+        } else {
+            pnlAduc.classList.remove('section-hidden');
+            pnlDiag.classList.add('section-hidden');
+            btnAduc.className = "px-3 py-1 rounded-md text-xs font-bold bg-indigo-600 text-white transition-all";
+            btnDiag.className = "px-3 py-1 rounded-md text-xs font-bold text-slate-400 hover:text-slate-200 transition-all";
+            selectAducFolder('root'); // Default load root objects in mockup ADUC
+        }
+    }
+
+    const ADUC_FOLDER_ITEMS = {
+        'root': [
+            { name: 'Builtin', type: 'Container' },
+            { name: 'Computers', type: 'Container' },
+            { name: 'Domain Controllers', type: 'Organizational Unit' },
+            { name: 'Users', type: 'Container' },
+            { name: 'Chaleun_Staff', type: 'Organizational Unit' }
+        ],
+        'builtin': [
+            { name: 'Administrators', type: 'Security Group - Builtin Local' },
+            { name: 'Users', type: 'Security Group - Builtin Local' },
+            { name: 'Guests', type: 'Security Group - Builtin Local' }
+        ],
+        'computers': [
+            { name: 'HR-PC-01', type: 'Computer' },
+            { name: 'SALES-LAPTOP-02', type: 'Computer' }
+        ],
+        'controllers': [
+            { name: 'DC-SERVER-2022', type: 'Computer (Domain Controller)' }
+        ],
+        'staff': [
+            { name: 'IT_Dept', type: 'Organizational Unit' },
+            { name: 'HR_Dept', type: 'Organizational Unit' },
+            { name: 'Sales_Dept', type: 'Organizational Unit' }
+        ],
+        'it': [
+            { name: 'it_admin (Somchai)', type: 'User' },
+            { name: 'it_support (Bounmy)', type: 'User' },
+            { name: 'IT_Admins_Group', type: 'Security Group - Global' }
+        ],
+        'hr': [
+            { name: 'hr_manager (Keo)', type: 'User' },
+            { name: 'hr_officer (Souk)', type: 'User' },
+            { name: 'HR_Staff_Group', type: 'Security Group - Global' }
+        ],
+        'sales': [
+            { name: 'sales_lead (Noy)', type: 'User' },
+            { name: 'sales_rep1 (Chan)', type: 'User' },
+            { name: 'Sales_Force_Group', type: 'Security Group - Global' }
+        ]
+    };
+
+    function selectAducFolder(key) {
+        document.querySelectorAll('.aduc-tree-item').forEach(item => {
+            item.className = "aduc-tree-item p-1.5 rounded cursor-pointer flex items-center gap-1.5 hover:bg-slate-900";
+        });
+        
+        const activeItem = document.getElementById(`aduc-folder-${key}`);
+        if (activeItem) {
+            activeItem.className = "aduc-tree-item p-1.5 rounded cursor-pointer flex items-center gap-1.5 hover:bg-slate-900 bg-slate-900 text-white font-bold";
+        }
+
+        const items = ADUC_FOLDER_ITEMS[key] || [];
+        const container = document.getElementById('aduc-list-container');
+        const header = document.getElementById('aduc-list-header');
+        const count = document.getElementById('aduc-list-count');
+
+        header.textContent = `Contents of: ${key.toUpperCase()}`;
+        count.textContent = `${items.length} Objects`;
+
+        container.innerHTML = '';
+        items.forEach(itm => {
+            let icon = '👤';
+            if (itm.type.includes('Container') || itm.type.includes('Unit')) icon = '📁';
+            else if (itm.type.includes('Computer')) icon = '🖥️';
+            else if (itm.type.includes('Group')) icon = '👥';
+
+            container.innerHTML += `
+                <div class="flex items-center justify-between p-1.5 bg-slate-950/40 rounded border border-slate-800 hover:bg-slate-900">
+                    <div class="flex items-center gap-1.5">
+                        <span>${icon}</span>
+                        <span class="font-bold text-white">${itm.name}</span>
+                    </div>
+                    <span class="text-[9px] text-slate-500 uppercase font-mono">${itm.type}</span>
+                </div>
+            `;
+        });
+    }
+
+    // Initialize node selection
+    selectAdNode('domain');
+
+
+    // --- Section 2: GPO Logic ---
+    let gpoSettings = {
+        wallpaper: 'disabled',
+        cp: 'disabled'
+    };
+
+    function toggleGpoSetting(policy, status) {
+        gpoSettings[policy] = status;
+        
+        const valWp = document.getElementById('gpo-val-wallpaper');
+        const valCp = document.getElementById('gpo-val-cp');
+
+        const btnWpDisable = document.getElementById('btn-gpo-wp-disable');
+        const btnWpEnable = document.getElementById('btn-gpo-wp-enable');
+        const btnCpDisable = document.getElementById('btn-gpo-cp-disable');
+        const btnCpEnable = document.getElementById('btn-gpo-cp-enable');
+
+        if (policy === 'wallpaper') {
+            if (status === 'enabled') {
+                valWp.textContent = "Enabled";
+                valWp.className = "text-[9px] bg-emerald-950/40 text-emerald-400 border border-emerald-900/60 px-1.5 py-0.5 rounded font-bold uppercase";
+                btnWpEnable.className = "flex-1 py-1 rounded text-[10px] font-bold bg-indigo-600 text-white transition-all";
+                btnWpDisable.className = "flex-1 py-1 rounded text-[10px] font-bold bg-slate-950 text-slate-500 transition-all border border-slate-800";
+            } else {
+                valWp.textContent = "Not Configured";
+                valWp.className = "text-[9px] bg-slate-950 text-slate-500 border border-slate-800 px-1.5 py-0.5 rounded font-bold uppercase";
+                btnWpDisable.className = "flex-1 py-1 rounded text-[10px] font-bold bg-indigo-600 text-white transition-all";
+                btnWpEnable.className = "flex-1 py-1 rounded text-[10px] font-bold bg-slate-950 text-slate-500 transition-all border border-slate-800";
+            }
+        } else {
+            if (status === 'enabled') {
+                valCp.textContent = "Enabled";
+                valCp.className = "text-[9px] bg-emerald-950/40 text-emerald-400 border border-emerald-900/60 px-1.5 py-0.5 rounded font-bold uppercase";
+                btnCpEnable.className = "flex-1 py-1 rounded text-[10px] font-bold bg-indigo-600 text-white transition-all";
+                btnCpDisable.className = "flex-1 py-1 rounded text-[10px] font-bold bg-slate-950 text-slate-500 transition-all border border-slate-800";
+            } else {
+                valCp.textContent = "Not Configured";
+                valCp.className = "text-[9px] bg-slate-950 text-slate-500 border border-slate-800 px-1.5 py-0.5 rounded font-bold uppercase";
+                btnCpDisable.className = "flex-1 py-1 rounded text-[10px] font-bold bg-indigo-600 text-white transition-all";
+                btnCpEnable.className = "flex-1 py-1 rounded text-[10px] font-bold bg-slate-950 text-slate-500 transition-all border border-slate-800";
+            }
+        }
+
+        // Show out-of-sync alert
+        const syncBadge = document.getElementById('gpo-sync-badge');
+        syncBadge.textContent = "Out of Sync (Pending gpupdate)";
+        syncBadge.className = "text-[8px] bg-amber-950/80 text-amber-400 border border-amber-900 px-1 rounded font-bold uppercase animate-pulse";
+    }
+
+    function triggerGpUpdate() {
+        const term = document.getElementById('gpo-terminal-text');
+        const syncBadge = document.getElementById('gpo-sync-badge');
+        
+        term.innerHTML = "C:\\Users\\ClientPC&gt; gpupdate /force<br>Updating policy...<br>";
+
+        setTimeout(() => {
+            term.innerHTML += "Computer Policy update has completed successfully.<br>User Policy update has completed successfully.<br>C:\\Users\\ClientPC&gt; _";
+            
+            // Sync UI changes
+            updateGpoUi();
+            
+            syncBadge.textContent = "In Sync (Active)";
+            syncBadge.className = "text-[8px] bg-emerald-950/80 text-emerald-400 border border-emerald-900 px-1 rounded font-bold uppercase";
+        }, 1200);
+    }
+
+    function updateGpoUi() {
+        const desktop = document.getElementById('virtual-desktop');
+        
+        // Wallpaper change
+        if (gpoSettings.wallpaper === 'enabled') {
+            desktop.style.backgroundImage = "linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=3564&auto=format&fit=crop')";
+        } else {
+            desktop.style.backgroundImage = "radial-gradient(circle, #1e293b 0%, #0f172a 100%)";
+        }
+    }
+
+    function doubleClickDesktopIcon(icon) {
+        const overlay = document.getElementById('win-dialog-overlay');
+        const iconSymbol = document.getElementById('win-dialog-icon');
+        const title = document.getElementById('win-dialog-title');
+        const text = document.getElementById('win-dialog-text');
+
+        overlay.classList.remove('section-hidden');
+
+        if (icon === 'cp') {
+            if (gpoSettings.cp === 'enabled') {
+                iconSymbol.textContent = "❌";
+                title.textContent = "Restrictions";
+                text.textContent = "This operation has been cancelled due to restrictions in effect on this computer. Please contact your system administrator.";
+            } else {
+                iconSymbol.textContent = "⚙️";
+                title.textContent = "Control Panel";
+                text.textContent = "Welcome to Control Panel. All system settings are accessible.";
+            }
+        } else if (icon === 'chrome') {
+            iconSymbol.textContent = "🌐";
+            title.textContent = "Chrome Browser";
+            text.textContent = "Google Chrome opened successfully. Connection is secure.";
+        }
+    }
+
+    function closeWinDialog() {
+        document.getElementById('win-dialog-overlay').classList.add('section-hidden');
+    }
+
+    function copyGpoCmd(btn) {
+        const text = 'gpupdate /force';
+        if (!navigator.clipboard) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.focus(); ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+        } else {
+            navigator.clipboard.writeText(text).catch(() => {});
+        }
+        const orig = btn.textContent;
+        btn.textContent = '✓ ຄັດລອກແລ້ວ';
+        btn.style.color = '#34d399';
+        setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 2000);
+    }
+
+    // Initialize values
+    updateGpoUi();
+
+
+    // --- Section 3: Permission Gates Sim ---
+    const PERM_RULES = {
+        'admin': {
+            'it-data':   { share: 'Allowed (Change)', ntfs: 'Allowed (Full Control)', eff: 'Full Control', ok: true },
+            'hr-data':   { share: 'Allowed (Change)', ntfs: 'Allowed (Full Control)', eff: 'Full Control', ok: true },
+            'public':    { share: 'Allowed (Change)', ntfs: 'Allowed (Full Control)', eff: 'Full Control', ok: true }
+        },
+        'hr': {
+            'it-data':   { share: 'Allowed (Read)', ntfs: 'Denied (No Access)', eff: 'Blocked at Gate 2', ok: false },
+            'hr-data':   { share: 'Allowed (Change)', ntfs: 'Allowed (Modify)', eff: 'Modify', ok: true },
+            'public':    { share: 'Allowed (Read)', ntfs: 'Allowed (Read)', eff: 'Read', ok: true }
+        },
+        'guest': {
+            'it-data':   { share: 'Denied (Blocked)', ntfs: 'Denied (No Access)', eff: 'Blocked at Gate 1', ok: false },
+            'hr-data':   { share: 'Denied (Blocked)', ntfs: 'Denied (No Access)', eff: 'Blocked at Gate 1', ok: false },
+            'public':    { share: 'Denied (Blocked)', ntfs: 'Allowed (Read)', eff: 'Blocked at Gate 1', ok: false }
+        }
+    };
+
+    function updatePermDetails() {
+        const user = document.getElementById('perm-sim-user').value;
+        const folder = document.getElementById('perm-sim-folder').value;
+        const rule = PERM_RULES[user]?.[folder];
+
+        if (!rule) return;
+
+        // Update formula text boxes
+        document.getElementById('formula-share').textContent = `Share: ${rule.share}`;
+        document.getElementById('formula-ntfs').textContent = `NTFS: ${rule.ntfs}`;
+        
+        const resultBox = document.getElementById('formula-result');
+        resultBox.textContent = `Effective: ${rule.eff}`;
+        if (rule.ok) {
+            resultBox.className = "text-emerald-400";
+        } else {
+            resultBox.className = "text-rose-400";
+        }
+
+        resetPermissionGates();
+    }
+
+    function resetPermissionGates() {
+        const avatar = document.getElementById('perm-user-avatar');
+        const doorShare = document.getElementById('gate-door-share');
+        const doorNtfs = document.getElementById('gate-door-ntfs');
+        const labelShare = document.getElementById('gate-share-status');
+        const labelNtfs = document.getElementById('gate-ntfs-status');
+        const banner = document.getElementById('perm-summary-banner');
+
+        avatar.style.left = '24px';
+        avatar.textContent = '👤';
+        doorShare.classList.remove('gate-open');
+        doorNtfs.classList.remove('gate-open');
+        doorShare.style.boxShadow = '';
+        doorNtfs.style.boxShadow = '';
+
+        labelShare.textContent = "CLOSE";
+        labelShare.className = "text-[9px] text-slate-500 font-bold";
+        labelNtfs.textContent = "LOCKED";
+        labelNtfs.className = "text-[9px] text-slate-500 font-bold";
+
+        banner.textContent = "ລໍຖ້າການທົດສອບ...";
+        banner.className = "h-full flex items-center justify-center p-3 rounded-lg border text-center font-bold bg-slate-900 border-slate-800 text-slate-400";
+    }
+
+    function runPermissionSimulation() {
+        resetPermissionGates();
+        
+        const user = document.getElementById('perm-sim-user').value;
+        const folder = document.getElementById('perm-sim-folder').value;
+        const rule = PERM_RULES[user]?.[folder];
+
+        if (!rule) return;
+
+        const avatar = document.getElementById('perm-user-avatar');
+        const doorShare = document.getElementById('gate-door-share');
+        const doorNtfs = document.getElementById('gate-door-ntfs');
+        const labelShare = document.getElementById('gate-share-status');
+        const labelNtfs = document.getElementById('gate-ntfs-status');
+        const banner = document.getElementById('perm-summary-banner');
+        const container = avatar.parentElement;
+        const containerW = container.offsetWidth;
+
+        // Compute gate positions proportionally
+        const gate1X = Math.round(containerW * 0.33) - 20;
+        const gate2X = Math.round(containerW * 0.60) - 20;
+        const targetX = Math.round(containerW * 0.85) - 20;
+
+        // Step 1: Walk to Gate 1 (Share)
+        setTimeout(() => {
+            avatar.style.left = gate1X + 'px';
+            
+            setTimeout(() => {
+                const sharePassed = !rule.share.includes('Denied');
+                
+                if (sharePassed) {
+                    doorShare.classList.add('gate-open');
+                    doorShare.style.boxShadow = '0 0 15px #3b82f6';
+                    labelShare.textContent = "PASSED";
+                    labelShare.className = "text-[9px] text-blue-400 font-bold animate-pulse";
+                    
+                    // Step 2: Walk to Gate 2 (NTFS)
+                    setTimeout(() => {
+                        avatar.style.left = gate2X + 'px';
+                        
+                        setTimeout(() => {
+                            const ntfsPassed = rule.ntfs.includes('Allowed');
+                            
+                            if (ntfsPassed) {
+                                doorNtfs.classList.add('gate-open');
+                                doorNtfs.style.boxShadow = '0 0 15px #10b981';
+                                labelNtfs.textContent = "UNLOCKED";
+                                labelNtfs.className = "text-[9px] text-emerald-400 font-bold animate-pulse";
+                                
+                                // Step 3: Walk to target data
+                                setTimeout(() => {
+                                    avatar.style.left = targetX + 'px';
+                                    avatar.textContent = '🎉';
+                                    
+                                    banner.textContent = "Access Granted! 🔓";
+                                    banner.className = "h-full flex items-center justify-center p-3 rounded-lg border text-center font-bold bg-emerald-950/20 border-emerald-900 text-emerald-400";
+                                }, 800);
+                            } else {
+                                avatar.textContent = '⛔';
+                                labelNtfs.textContent = "DENIED";
+                                labelNtfs.className = "text-[9px] text-red-500 font-bold";
+                                doorNtfs.style.boxShadow = '0 0 10px #ef4444';
+                                
+                                banner.textContent = "Blocked at NTFS! 🔒";
+                                banner.className = "h-full flex items-center justify-center p-3 rounded-lg border text-center font-bold bg-rose-950/20 border-rose-900 text-rose-400";
+                            }
+                        }, 500);
+                    }, 1000);
+                } else {
+                    avatar.textContent = '❌';
+                    labelShare.textContent = "BLOCKED";
+                    labelShare.className = "text-[9px] text-red-500 font-bold";
+                    doorShare.style.boxShadow = '0 0 10px #ef4444';
+                    
+                    banner.textContent = "Blocked at Share! 🔒";
+                    banner.className = "h-full flex items-center justify-center p-3 rounded-lg border text-center font-bold bg-rose-950/20 border-rose-900 text-rose-400";
+                }
+            }, 500);
+        }, 100);
+    }
+
+    // Initialize values
+    updatePermDetails();
+
+
+    // --- Section 4: FSRM Tools Sim ---
+    
+    // 1. Quota
+    let quotaUsed = 70;
+    function addQuotaSpace(amount) {
+        quotaUsed = Math.min(110, quotaUsed + amount);
+        const progress = document.getElementById('quota-progress');
+        const badge = document.getElementById('quota-badge');
+        const quotaError = document.getElementById('quota-error-banner');
+        
+        progress.style.width = Math.min(100, quotaUsed) + '%';
+        badge.textContent = `${quotaUsed} MB / 100 MB (${Math.min(100, quotaUsed)}%)`;
+
+        if (quotaUsed > 100) {
+            progress.className = "bg-red-500 h-full rounded-full transition-all duration-300";
+            badge.className = "text-red-500 font-bold animate-bounce";
+            if (quotaError) {
+                quotaError.classList.remove('section-hidden');
+            }
+        } else if (quotaUsed >= 85) {
+            progress.className = "bg-amber-500 h-full rounded-full transition-all duration-300";
+            badge.className = "text-amber-500 font-bold";
+            if (quotaError) quotaError.classList.add('section-hidden');
+        } else {
+            progress.className = "bg-indigo-500 h-full rounded-full transition-all duration-300";
+            badge.className = "text-indigo-400";
+            if (quotaError) quotaError.classList.add('section-hidden');
+        }
+    }
+
+    function resetQuotaSpace() {
+        quotaUsed = 70;
+        const progress = document.getElementById('quota-progress');
+        const badge = document.getElementById('quota-badge');
+        const quotaError = document.getElementById('quota-error-banner');
+        
+        progress.style.width = '70%';
+        badge.textContent = '70 MB / 100 MB (70%)';
+        progress.className = "bg-indigo-500 h-full rounded-full transition-all";
+        badge.className = "text-indigo-400";
+        if (quotaError) quotaError.classList.add('section-hidden');
+    }
+
+    // 2. File Screening
+    function testFileScreen(filename) {
+        const resBox = document.getElementById('screen-result');
+        if (filename === 'work.docx') {
+            resBox.textContent = `✅ Success: 'work.docx' uploaded successfully to server folder.`;
+            resBox.className = "text-[10px] text-emerald-400 font-semibold p-2.5 bg-emerald-950/20 border border-emerald-900 rounded-lg w-full text-center";
+        } else {
+            resBox.textContent = `❌ Blocked: FSRM active. Audio/Video files (like '${filename}') are blocked.`;
+            resBox.className = "text-[10px] text-red-400 font-semibold p-2.5 bg-red-950/20 border border-red-900 rounded-lg w-full text-center";
+        }
+    }
+
+    // 3. ABE
+    let abeOn = false;
+    function toggleAbeSwitch() {
+        abeOn = !abeOn;
+        const btn = document.getElementById('btn-abe-toggle');
+        const folder = document.getElementById('abe-hr-folder');
+        const text = document.getElementById('abe-explain-text');
+
+        if (abeOn) {
+            btn.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span><span>ABE: ON</span>`;
+            btn.className = "bg-indigo-950 hover:bg-slate-800 text-[10px] font-bold text-emerald-400 px-3 py-1 rounded border border-indigo-900 flex items-center gap-1.5 transition-all";
+            
+            // Visual fade out
+            folder.style.opacity = '0';
+            folder.style.transform = 'scale(0)';
+            
+            text.innerHTML = `✨ <strong>ABE active:</strong> ໂຟນເດີ HR_Secret ຖືກຊ່ອນໄວ້ ພະນັກງານ Sales ຈະບໍ່ເຫັນໃນລະບົບເລີຍ.`;
+        } else {
+            btn.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-slate-600"></span><span>ABE: OFF</span>`;
+            btn.className = "bg-slate-900 hover:bg-slate-800 text-[10px] font-bold text-slate-400 px-3 py-1 rounded border border-slate-800 flex items-center gap-1.5 transition-all";
+            
+            // Visual restore
+            folder.style.opacity = '1';
+            folder.style.transform = 'scale(1)';
+            
+            text.textContent = "Sales User ຍັງເຫັນໂຟນເດີ HR ຢູ່ (ແຕ່ດັບເບິນຄລິກເຂົ້າຈະຂຶ້ນ Access Denied).";
+        }
+    }
+
+    // 4. Shadow copies
+    const SHADOW_VERSIONS = {
+        '9am': {
+            content: 'Draft 1: Setup systems completed.\nAll core services active.',
+            status: '✅ Restore Success: ຂໍ້ມູນກັບຄືນຫາສະບັບ 09:00 AM (ຂໍ້ມູນຖືກແກ້ໄຂຄືນ)'
+        },
+        '10am': {
+            content: 'Draft 2: User list added.\nStaff profiles sync completed.',
+            status: '✅ Restore Success: ຂໍ້ມູນກັບຄືນຫາສະບັບ 10:00 AM (ຂໍ້ມູນຖືກແກ້ໄຂຄືນ)'
+        }
+    };
+
+    function restoreShadowVersion(ver) {
+        const data = SHADOW_VERSIONS[ver];
+        if (!data) return;
+
+        const fc = document.getElementById('shadow-file-content');
+        const stat = document.getElementById('shadow-status-banner');
+
+        fc.textContent = data.content;
+        fc.className = "text-emerald-400 font-mono font-semibold";
+        
+        stat.textContent = data.status;
+        stat.className = "mt-4 text-[10px] text-center text-emerald-400 font-bold animate-pulse";
+    }
+
+    // Initial section display
+    showSection('section-network');
+    </script>
+</body>
+</html>
